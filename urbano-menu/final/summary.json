@@ -1,0 +1,83 @@
+[
+ {
+  "page": 1,
+  "name": "cover",
+  "rows": 0,
+  "src_pitch": 0,
+  "new_pitch": 49.0,
+  "photo_scale": 1.0,
+  "size": "1066x1600"
+ },
+ {
+  "page": 2,
+  "name": "pizza-blanche",
+  "rows": 10,
+  "src_pitch": 46.0,
+  "new_pitch": 49.0,
+  "photo_scale": 0.95,
+  "size": "1066x1600"
+ },
+ {
+  "page": 3,
+  "name": "tacos-fajitas",
+  "rows": 11,
+  "src_pitch": 47.2,
+  "new_pitch": 49.0,
+  "photo_scale": 0.96,
+  "size": "1066x1600"
+ },
+ {
+  "page": 4,
+  "name": "pizza-tomate",
+  "rows": 9,
+  "src_pitch": 51.0,
+  "new_pitch": 49.0,
+  "photo_scale": 1.0,
+  "size": "1066x1600"
+ },
+ {
+  "page": 5,
+  "name": "sandwich-burger",
+  "rows": 12,
+  "src_pitch": 43.2,
+  "new_pitch": 49.0,
+  "photo_scale": 0.89,
+  "size": "1066x1600"
+ },
+ {
+  "page": 6,
+  "name": "souflet-matlou3",
+  "rows": 12,
+  "src_pitch": 43.5,
+  "new_pitch": 49.0,
+  "photo_scale": 0.86,
+  "size": "1066x1600"
+ },
+ {
+  "page": 7,
+  "name": "crepe-gaufre-pancake",
+  "rows": 16,
+  "src_pitch": 28.9,
+  "new_pitch": 40.0,
+  "photo_scale": 0.8,
+  "size": "1066x1600"
+ },
+ {
+  "page": 8,
+  "name": "tiramisu-cheesecake-dessert",
+  "rows": 20,
+  "src_pitch": 26.9,
+  "new_pitch": 39.0,
+  "photo_scale": 0.72,
+  "size": "1066x1600"
+ },
+ {
+  "page": 9,
+  "name": "milkshake-jus-mojito-boissons",
+  "rows": 25,
+  "src_pitch": 24.2,
+  "new_pitch": 31.0,
+  "photo_scale": 0.78,
+  "size": "1066x1600"
+ }
+]

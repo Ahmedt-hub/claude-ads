@@ -709,7 +709,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         lo, hi = np_["est_reach"]
         B.append(blk(f'<div class="sec"><div class="next"><div><h3>🎁 الباقة المقترحة لك: {esc(np_["tier"])} '
                      f'<bdi>· {np_["days"]} أيام</bdi></h3>'
-                     f'<p>{esc(nxt.get("reason", ""))}<br>👀 الوصول المتوقع: <bdi>{fmt(lo)} – {fmt(hi)}</bdi> شخص.</p></div>'
+                     f'<p>{esc(nxt.get("reason", ""))}<br>👀 الوصول المتوقع: <bdi dir="ltr">{fmt(lo)} – {fmt(hi)}</bdi> شخص.</p></div>'
                      f'<div class="price"><b>{fmt(np_["price"], "dzd")}</b><small>{np_["days"]} أيام</small></div>'
                      f'</div></div>', new_page=np_flag))
     B.append(blk(f'<div class="thanks">شكراً لثقتك في {esc(agency["agency_name"])} 💙</div>'))

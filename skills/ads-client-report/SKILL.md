@@ -59,6 +59,38 @@ Verify field names with `ads_get_field_context` first, then `ads_get_ad_entities
 
 Missing metrics → `null` (the renderer hides them, never shows 0).
 Hook/Thumb-Stop rate = 3s plays / impressions; Hold rate = ThruPlays / 3s plays (auto-computed).
+Messages per hour are not available: use hourly impressions with `"hourly_metric": "impressions"`.
+
+### Step 3b: Inspect the ad itself (every report, required)
+Look at the creative, not only the numbers:
+1. `ads_get_creatives` (body, title, object_type) for the ad text.
+2. `ads_get_ad_preview` (`ad_id`, `ad_format=MOBILE_FEED_STANDARD`), then screenshot it:
+   `python3 scripts/ad_preview_screenshot.py --url "<preview_url>" --out reports/<client>/ad.png`
+   and open the PNG.
+3. Check and note every problem found:
+   - **Page category** shown under the ad (e.g. "Grocery Store" for a shoe shop) → fix the category.
+   - **Price** missing in text/visual ("ابتداءً من ... دج", per pack for wholesale).
+   - **What is sold is clear** from the first line and first image (e.g. kids' sizes → say "أحذية أطفال").
+   - **Delivery / COD** mentioned (58/69 wilayas, الدفع عند الاستلام).
+   - **Number of images**: too many (> 6) dilutes; 4–6 best products or a carousel per product.
+   - **Image quality**: background, light, cropped or unreadable overlay text.
+   - **Off-topic hashtags** (#حلاقة, #ماشطة, #تكتوك …) → remove.
+   - **Targeting fit** vs product (e.g. wholesale → shop owners/retail interests; women's jewellery → women).
+   - Contact outside Messenger (phone, Telegram, WhatsApp) → those leads are not counted in results.
+4. Put the client-relevant findings in `recommendations` (direct wording if the agency did not make
+   the creative, constructive if it did). Put agency-side findings in the private notes to the owner.
+
+**Engagement vs. quality:** in a messages campaign, few likes/comments do **not** mean a weak ad:
+Meta delivers to people likely to message, not to react. Judge the ad by conversations, cost per
+conversation and CTR (all). Say this to the owner whenever engagement looks low.
+
+### Step 3c: Private checks for the owner (never in the client report)
+- Excluded regions vs. the shop's address in the ad text (e.g. Batna excluded but shop in Batna).
+- Instagram account linked? (`ads_get_ig_accounts`; IG reach ≈ 0 means not linked.)
+- Ad set optimisation goal: Messenger lead form (`LEAD_GENERATION`) → completed leads vs conversations.
+- Gender/age expansion turned on (people outside the targeting reached).
+- Reach below the package minimum → explain why (objective, audience size, budget).
+- Link CTR in Messenger campaigns is naturally low → `"hide_ratings": ["link_ctr"]` if it would show 🔴.
 
 ### Step 4: Write the analysis (Arabic, simple)
 - `summary` (optional; auto-generated otherwise): 2–3 lines, the result and cost per result in DZD.
@@ -81,7 +113,8 @@ the PDF, the page images and the summary card to the owner. Mention any warnings
 
 ## Data file schema
 See `sample-data.json`. Keys: `client_name`, `campaign_name`, `objective`,
-`start_date`, `end_date` (YYYY-MM-DD), `package {tier, days}`, `is_video`,
+`start_date`, `end_date` (YYYY-MM-DD), `package {tier, days, price?}` (price = discounted
+DZD amount the client actually paid), `is_video`, `hide_ratings[]`, `hourly_metric`,
 `made_by_agency`, `metrics {...}`, `daily [{date, results}]`,
 `hourly [{hour, results}]`, `platforms [{name, reach, results}]`,
 `age_gender [{age, male, female}]`, `regions [{name, reach}]`,

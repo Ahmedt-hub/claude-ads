@@ -120,6 +120,9 @@ the PDF, the page images and the summary card to the owner. Mention any warnings
 See `sample-data.json`. Keys: `client_name`, `campaign_name`, `objective`,
 `start_date`, `end_date` (YYYY-MM-DD), `package {tier, days, price?}` (price = discounted
 DZD amount the client actually paid), `is_video`, `hide_ratings[]`, `hourly_metric`,
+`result_key` / `result_unit` (override the main result, e.g. `video_3s` for an engagement
+campaign whose "engagements" are mostly video plays), `cost_basis: "reach_1000"` (cost per 1,000
+people reached when cost per result would round to ~0 DZD),
 `made_by_agency`, `metrics {...}`, `daily [{date, results}]`,
 `hourly [{hour, results}]`, `platforms [{name, reach, results}]`,
 `age_gender [{age, male, female}]`, `regions [{name, reach}]`,

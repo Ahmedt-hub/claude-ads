@@ -244,7 +244,12 @@ def lookup_package(agency: dict, pkg: dict) -> dict:
 def compute(data: dict, agency: dict) -> tuple[dict, list[str]]:
     warnings: list[str] = []
     m = dict(data.get("metrics", {}))
-    obj = OBJECTIVES.get(data.get("objective", "messages"), OBJECTIVES["messages"])
+    obj = dict(OBJECTIVES.get(data.get("objective", "messages"), OBJECTIVES["messages"]))
+    # optional overrides: main result metric / unit (e.g. video views for an engagement campaign)
+    if data.get("result_key") in METRICS:
+        obj["result_key"] = data["result_key"]
+    if data.get("result_unit"):
+        obj["unit"] = data["result_unit"]
     pkg = lookup_package(agency, data["package"])
 
     # derived video rates
@@ -259,6 +264,14 @@ def compute(data: dict, agency: dict) -> tuple[dict, list[str]]:
 
     results = num(m.get(obj["result_key"]))
     cpr = pkg["price"] / results if results else None
+    obj["cpr_label"] = f"تكلفة {obj['unit']} الواحدة"
+    obj["cpr_exp"] = f"سعر الباقة ({fmt(pkg['price'], 'dzd')}) مقسوماً على عدد النتائج."
+    if data.get("cost_basis") == "reach_1000" and num(m.get("reach")):
+        # awareness / engagement: cost to reach 1,000 people is more meaningful than cost per view
+        cpr = pkg["price"] / num(m["reach"]) * 1000
+        obj["cpr_label"] = "تكلفة الوصول إلى 1000 شخص"
+        obj["cpr_exp"] = f"سعر الباقة ({fmt(pkg['price'], 'dzd')}) مقسوماً على عدد الأشخاص الذين وصلهم الإعلان، لكل 1000 شخص."
+        obj["cost_basis"] = "reach_1000"
     reach = num(m.get("reach"))
     cpm_reach = pkg["price"] / reach * 1000 if reach else None
 
@@ -512,7 +525,10 @@ def auto_summary(data: dict, c: dict) -> str:
     parts = []
     if m.get("reach") is not None:
         parts.append(f"👀 وصل إعلانك إلى <b>{fmt(m['reach'])}</b> شخص وظهر <b>{fmt(m.get('impressions'))}</b> مرة.")
-    if c["results"]:
+    if c["results"] and obj.get("cost_basis") == "reach_1000":
+        parts.append(f"🎯 حققت الحملة <b>{fmt(c['results'])}</b> {obj['unit']}، "
+                     f"وكل 1000 شخص وصلهم الإعلان كلّفوك حوالي <b>{fmt(c['cpr'], 'dzd')}</b> فقط.")
+    elif c["results"]:
         parts.append(f"🎯 حققت الحملة <b>{fmt(c['results'])}</b> {obj['unit']}، "
                      f"أي أن كل {obj['unit']} كلّفتك حوالي <b>{fmt(c['cpr'], 'dzd')}</b> فقط.")
     return " ".join(parts)
@@ -550,9 +566,9 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
                     f'<small>{esc(METRICS[obj["result_key"]][0])}</small>'
                     f'<strong>{fmt(c["results"])}</strong><em>{esc(METRICS[obj["result_key"]][1])}</em></div>')
     if c["cpr"]:
-        hero.append(f'<div class="kpi c-orange"><span class="kic">💰</span><small>تكلفة {esc(obj["unit"])} الواحدة</small>'
+        hero.append(f'<div class="kpi c-orange"><span class="kic">💰</span><small>{esc(obj["cpr_label"])}</small>'
                     f'<strong>{fmt(c["cpr"], "dzd")}</strong>'
-                    f'<em>سعر الباقة ({fmt(pkg["price"], "dzd")}) مقسوماً على عدد النتائج.</em></div>')
+                    f'<em>{esc(obj["cpr_exp"])}</em></div>')
     for k in ["reach", "impressions", "frequency", "link_clicks"]:
         if m.get(k) is not None and len(hero) < 6:
             lab, exp, kind = METRICS[k]
@@ -770,7 +786,7 @@ def build_card_html(data: dict, agency: dict, c: dict) -> str:
         tiles.append((OBJ_EMOJI.get(data.get("objective"), "🎯"), METRICS[obj["result_key"]][0],
                       fmt(c["results"]), "green"))
     if c["cpr"]:
-        tiles.append(("💰", f"تكلفة {obj['unit']} الواحدة", fmt(c["cpr"], "dzd"), "orange"))
+        tiles.append(("💰", obj["cpr_label"], fmt(c["cpr"], "dzd"), "orange"))
     for k in ["reach", "impressions", "link_clicks", "frequency"]:
         if m.get(k) is not None and len(tiles) < 6:
             tiles.append((EMOJI[k], METRICS[k][0], fmt(m[k], METRICS[k][2]), KPI_COLOR.get(k, "blue")))

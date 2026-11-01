@@ -74,9 +74,10 @@ Hook/Thumb-Stop rate = 3s plays / impressions; Hold rate = ThruPlays / 3s plays 
 ```bash
 python3 scripts/client_report.py --data <campaign>.json --out-dir reports/<client>/
 ```
-Outputs `<name>.pdf`, `<name>.png`, `<name>.html` and JSON with `warnings`
-and computed values. Open the PNG and the PDF pages to check the layout, then send
-both files to the owner. Mention any warnings to the owner only.
+Outputs `<name>.pdf`, every PDF page as an image `<name>-page-N.png` (1588x2246),
+the summary card `<name>.png`, `<name>.html` and JSON with `warnings`
+and computed values. Open the PNG and the page images to check the layout, then send
+the PDF, the page images and the summary card to the owner. Mention any warnings to the owner only.
 
 ## Data file schema
 See `sample-data.json`. Keys: `client_name`, `campaign_name`, `objective`,

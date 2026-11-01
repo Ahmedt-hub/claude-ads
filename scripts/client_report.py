@@ -4,6 +4,7 @@ Client campaign report generator (Arabic, RTL, agency-branded).
 
 Turns a campaign data JSON (collected from the Meta Ads MCP tools) into:
   * a multi-page A4 PDF report for the client, and
+  * every PDF page as a PNG image (<name>-page-N.png), and
   * a single 1080x1350 PNG summary card (for WhatsApp / Messenger).
 
 Business rules (see skills/ads-client-report/SKILL.md):
@@ -20,7 +21,8 @@ Usage:
     python3 scripts/client_report.py --data campaign.json --html-only
 
 Output (stdout, JSON):
-    {"pdf": "...", "png": "...", "html": "...", "warnings": [...], "computed": {...}}
+    {"pdf": "...", "png": "...", "pages": ["...-page-1.png", ...], "html": "...",
+     "warnings": [...], "computed": {...}}
 """
 
 from __future__ import annotations
@@ -852,6 +854,16 @@ def render(report_html: str, card_html: str, out_dir: Path, name: str) -> dict:
         page.wait_for_function("window.__reportReady === true", timeout=20000)
         page.pdf(path=str(pdf_path), format="A4", print_background=True,
                  margin={"top": "0", "right": "0", "bottom": "0", "left": "0"})
+        # every PDF page also as an image (A4 at 2x: 1588x2246) for WhatsApp/Messenger
+        shots = browser.new_page(viewport={"width": 794, "height": 1123}, device_scale_factor=2)
+        shots.goto(html_path.as_uri())
+        shots.wait_for_function("window.__reportReady === true", timeout=20000)
+        pages_el = shots.locator(".page")
+        page_imgs = []
+        for i in range(pages_el.count()):
+            ip = out_dir / f"{name}-page-{i + 1}.png"
+            pages_el.nth(i).screenshot(path=str(ip))
+            page_imgs.append(str(ip))
         card = browser.new_page(viewport={"width": 1080, "height": 1350})
         card.goto(card_path.as_uri())
         card.wait_for_load_state("networkidle")
@@ -859,7 +871,7 @@ def render(report_html: str, card_html: str, out_dir: Path, name: str) -> dict:
         card.screenshot(path=str(png_path), full_page=False)
         browser.close()
     card_path.unlink(missing_ok=True)
-    return {"pdf": str(pdf_path), "png": str(png_path), "html": str(html_path)}
+    return {"pdf": str(pdf_path), "png": str(png_path), "pages": page_imgs, "html": str(html_path)}
 
 
 def main() -> int:

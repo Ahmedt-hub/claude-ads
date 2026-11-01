@@ -35,7 +35,7 @@ DZD packages): `skills/ads-client-report/assets/agency.json`. Example input:
 1. Which package did the client buy? (tier: ابتدائية / متوسطة / متقدمة + days)
 2. Did the client give any feedback? (e.g. "no sales", "nobody engaged with the video")
 3. Did the agency make the video/design for the client?
-4. (If the API can't return them) Facebook Page visits and Instagram profile visits during the campaign.
+4. (Only if the campaign had real Instagram reach and the API can't return it) Instagram profile visits.
    - **Yes:** creative critique stays constructive ("next version we will…").
    - **No:** creative advice can be direct ("we recommend you film…").
 
@@ -51,12 +51,10 @@ Verify field names with `ads_get_field_context` first, then `ads_get_ad_entities
 - Totals: reach, impressions, frequency, clicks (all), link clicks, CTR (all), link CTR,
   messaging conversations started, post engagement, reactions, comments, shares,
   saves, Instagram profile visits, IG follows, FB follows.
-- **Page / profile visits (always in the report):** `fb_page_visits` (Facebook Page visits) and
-  `ig_profile_visits` (Instagram profile visits). Try `ads_get_field_context` for them first; the
-  Meta Ads MCP currently does not expose them. If unavailable, ask the owner in the Step 1 message
-  for the two numbers for the campaign dates: Instagram profile visits from the Ads Manager column
-  "Instagram profile visits", Facebook Page visits from Meta Business Suite → Insights → "Facebook
-  visits". If the owner can't provide one, set it to `null` (hidden, never 0).
+- **Instagram profile visits** (`ig_profile_visits`): try `ads_get_field_context` first; the Meta Ads
+  MCP currently does not expose it. Only when the campaign had real Instagram reach, ask the owner
+  for the Ads Manager column "Instagram profile visits"; otherwise `null` (hidden, never 0).
+  Facebook Page visits are not part of the report (owner's decision).
 - Video (if video): 3-second plays, ThruPlays, 50% and 100% plays, average watch time.
 - Breakdowns (separate calls): `publisher_platform`, `age,gender`, `region`,
   hourly (`hourly_stats_aggregated_by_audience_time_zone`), daily (`time_increment="1"`).

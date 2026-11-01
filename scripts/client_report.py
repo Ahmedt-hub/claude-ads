@@ -234,7 +234,11 @@ def lookup_package(agency: dict, pkg: dict) -> dict:
     if not entry:
         raise SystemExit(json.dumps({"error": f"Unknown package: tier={pkg.get('tier')} days={days}"},
                                     ensure_ascii=False))
-    return {"tier": tier, "days": int(days), **entry}
+    out = {"tier": tier, "days": int(days), **entry}
+    if pkg.get("price"):  # negotiated / discounted price overrides the list price
+        out["list_price"] = entry["price"]
+        out["price"] = int(pkg["price"])
+    return out
 
 
 def compute(data: dict, agency: dict) -> tuple[dict, list[str]]:
@@ -608,12 +612,13 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     np_flag = True
     hourly = data.get("hourly") or []
     if hourly:
-        hmap = {int(h.get("hour", 0)): num(h.get("results")) or 0 for h in hourly}
+        hkey = data.get("hourly_metric", "results")
+        hmap = {int(h.get("hour", 0)): num(h.get(hkey)) or 0 for h in hourly}
         pts = [(f"{h:02d}", hmap.get(h, 0)) for h in range(24)]
         top = [t for t in sorted(pts, key=lambda t: -t[1])[:3] if t[1] > 0]
         B.append(blk(f'<div class="sec c-orange"><h2>⏰ أوقات الذروة</h2><div class="chart">'
                      f'{svg_bars(pts, height=160, highlight_top=3, label_every=2, color="#fb8c3c", base="#AFD0FB")}</div>'
-                     f'<p class="note">🔥 أكثر الساعات نشاطاً: <b>{"، ".join(f"<bdi>{t[0]}:00</bdi>" for t in top)}</b>. '
+                     f'<p class="note">🔥 {"أكثر الساعات التي شوهد فيها إعلانك" if hkey == "impressions" else "أكثر الساعات نشاطاً"}: <b>{"، ".join(f"<bdi>{t[0]}:00</bdi>" for t in top)}</b>. '
                      f'ننصحك بأن تكون متاحاً للرد في هذه الأوقات.</p></div>', new_page=np_flag))
         np_flag = False
     plats = data.get("platforms") or []
@@ -891,7 +896,7 @@ def main() -> int:
     report_html = build_report_html(data, agency, c, data_path.parent)
     card_html = build_card_html(data, agency, c)
     name = args.name or slug(f'{data.get("client_name", "client")}-{data.get("end_date", "")}')
-    out_dir = Path(args.out_dir)
+    out_dir = Path(args.out_dir).resolve()
 
     if args.html_only:
         out_dir.mkdir(parents=True, exist_ok=True)

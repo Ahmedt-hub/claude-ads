@@ -99,7 +99,7 @@ OBJ_EMOJI = {"messages": "💬", "engagement": "🔥", "profile": "📸", "video
 # colour of each metric card / tile
 KPI_COLOR = {"reach": "blue", "impressions": "purple", "frequency": "yellow", "link_clicks": "teal",
              "thruplays": "red"}
-CYCLE = ["#3b82f6", "#22c55e", "#fb8c3c", "#facc15", "#a78bfa", "#2dd4bf", "#f472b6", "#f05252"]
+CYCLE = ["#146884"]
 REC_STYLE = [("💡", "yellow"), ("🎯", "green"), ("⏰", "orange"), ("📣", "blue"), ("🚀", "purple"), ("✅", "teal")]
 VIDEO_KEYS = ["video_3s", "hook_rate", "thruplays", "hold_rate", "video_p50",
               "video_p100", "avg_watch_time"]
@@ -377,21 +377,16 @@ html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Color Emo
 #src{position:absolute;left:-10000px;top:0;width:184mm;visibility:hidden}
 .page:last-of-type{page-break-after:auto}
 /* colour themes */
-.c-blue{--c:#3b82f6;--ci:#1d4ed8;--cbg:#eaf2ff}
-.c-green{--c:#22c55e;--ci:#15803d;--cbg:#e8f9ee}
-.c-orange{--c:#fb8c3c;--ci:#c2410c;--cbg:#fff1e6}
-.c-yellow{--c:#facc15;--ci:#a16207;--cbg:#fff9db}
-.c-red{--c:#f05252;--ci:#c81e1e;--cbg:#fdecec}
-.c-purple{--c:#a78bfa;--ci:#6d28d9;--cbg:#f3eeff}
-.c-teal{--c:#2dd4bf;--ci:#0f766e;--cbg:#e6fbf7}
+.c-blue,.c-green,.c-orange,.c-yellow,.c-red,.c-purple,.c-teal{--ci:var(--primary);--cbg:var(--bg)}
+.c-blue{--c:#3b82f6}.c-green{--c:#22c55e}.c-orange{--c:#fb8c3c}.c-yellow{--c:#facc15}
+.c-red{--c:#f05252}.c-purple{--c:#a78bfa}.c-teal{--c:#2dd4bf}
 .band{height:28mm;margin:0 -13mm 5mm;padding:0 13mm;display:flex;align-items:center;justify-content:space-between;
- background:linear-gradient(90deg,var(--bg) 0%%,var(--bg) 55%%,var(--soft) 100%%);border-bottom:4px solid transparent;
- border-image:linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6) 1}
+ background:linear-gradient(90deg,var(--bg) 0%%,var(--bg) 55%%,var(--soft) 100%%);border-bottom:3px solid var(--primary)}
 .band img{height:19mm}
 .band .t h1{font-size:20pt;font-weight:800;color:var(--primary);line-height:1.15}
 .band .t p{font-size:11pt;color:var(--secondary);font-weight:700}
 .mini-band{flex:none;height:16mm;margin:0 -13mm 6mm;padding:0 13mm;display:flex;align-items:center;justify-content:space-between;
- background:var(--bg);border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6) 1}
+ background:var(--bg);border-bottom:2px solid var(--primary)}
 .mini-band img{height:10mm}
 .mini-band span{font-size:11pt;color:var(--primary);font-weight:700}
 .footer{position:absolute;bottom:0;left:0;right:0;height:14mm;background:var(--primary);color:#fff;display:flex;
@@ -403,16 +398,16 @@ h2{font-size:14pt;color:var(--primary);font-weight:800;margin:0 0 3mm;display:fl
 .grp{font-size:12pt;color:var(--ci);font-weight:800;margin:0 0 2.5mm}
 .sec{margin-bottom:4.5mm;break-inside:avoid}
 .client{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-bottom:5mm}
-.client>div{background:var(--cbg);border-radius:3.5mm;padding:3mm 3.5mm;border-bottom:3px solid var(--c)}
+.client>div{background:var(--bg);border-radius:3.5mm;padding:3mm 3.5mm}
 .client small{display:block;font-size:8.5pt;color:var(--muted)}
 .client strong{font-size:11.5pt;color:var(--ci);font-weight:800}
 .client strong.dates{font-size:10pt;line-height:1.5}
 .summary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:5mm;padding:4mm 6mm;margin-bottom:5mm}
-.summary h3{font-size:12.5pt;font-weight:800;color:#fde68a;margin-bottom:1.5mm}
+.summary h3{font-size:12.5pt;font-weight:800;color:var(--soft);margin-bottom:1.5mm}
 .summary p{font-size:12pt;line-height:1.75;font-weight:500}
-.summary b{color:#fde68a}
+.summary b{color:#fff;font-weight:800}
 .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin-bottom:5mm}
-.kpi{position:relative;border-radius:4.5mm;padding:3mm 3.5mm;background:var(--cbg);border-top:5px solid var(--c)}
+.kpi{position:relative;border-radius:4.5mm;padding:3mm 3.5mm;background:var(--bg);border-top:3px solid var(--c)}
 .kpi .kic{position:absolute;left:3mm;top:3mm;font-size:17pt}
 .kpi small{font-size:9.5pt;color:var(--muted);font-weight:700}
 .kpi strong{display:block;font-size:20pt;color:var(--ci);font-weight:800;line-height:1.3}
@@ -422,7 +417,7 @@ h2{font-size:14pt;color:var(--primary);font-weight:800;margin:0 0 3mm;display:fl
 .promise p{font-size:11pt;line-height:1.6}
 .promise b{color:#15803d}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:2mm}
-.m{display:grid;grid-template-columns:9mm 1fr;gap:2.5mm;align-items:start;border-radius:3.5mm;background:var(--cbg);padding:2.2mm 3mm;border-right:4px solid var(--c)}
+.m{display:grid;grid-template-columns:9mm 1fr;gap:2.5mm;align-items:start;border-radius:3.5mm;background:var(--bg);padding:2.2mm 3mm}
 .m .ic{width:9mm;height:9mm;border-radius:50%%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13pt}
 .m .top{display:flex;justify-content:space-between;align-items:baseline;gap:2mm}
 .m .lab{font-size:10pt;font-weight:700;color:var(--ink)}
@@ -438,39 +433,39 @@ h2{font-size:14pt;color:var(--primary);font-weight:800;margin:0 0 3mm;display:fl
 .hb-lab{font-weight:700}
 .hb-track{height:4.6mm;background:#fff;border-radius:2.3mm;overflow:hidden}
 .hb-fill{height:100%%;border-radius:2.3mm}
-.hb-val{font-weight:800;color:var(--ink);font-size:9.5pt}.hb-val span{color:var(--muted);font-weight:500;font-size:8.5pt}
+.hb-val{font-weight:800;color:var(--primary);font-size:9.5pt}.hb-val span{color:var(--muted);font-weight:500;font-size:8.5pt}
 .ag-legend{font-size:9.5pt;color:var(--muted);display:flex;align-items:center;gap:1.5mm;margin-bottom:2mm}
 .dot{width:3mm;height:3mm;border-radius:50%%;display:inline-block;margin-inline-start:3mm}
-.dot.gm,.ag-bar.gm{background:#3b82f6}.dot.gf,.ag-bar.gf{background:#f472b6}
+.dot.gm,.ag-bar.gm{background:var(--primary)}.dot.gf,.ag-bar.gf{background:var(--accent)}
 .ag-row{display:grid;grid-template-columns:13mm 1fr;align-items:center;gap:2mm;margin-bottom:1.6mm}
 .ag-lab{font-size:9.5pt;font-weight:700}
 .ag-bars{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.5mm;font-size:8pt;color:var(--muted)}
 .ag-bar{height:2.8mm;border-radius:1.4mm;min-width:.6mm}
 .ag-break{flex-basis:100%%;height:.8mm}
-.best{display:grid;grid-template-columns:52mm 1fr;gap:5mm;background:#fff9db;border:2px solid #fde68a;border-radius:4mm;padding:4mm}
+.best{display:grid;grid-template-columns:52mm 1fr;gap:5mm;background:var(--bg);border-radius:4mm;padding:4mm}
 .best img{width:52mm;height:52mm;object-fit:cover;border-radius:3mm;background:#fff}
-.best .noimg{width:52mm;height:52mm;border-radius:3mm;background:#fde68a;display:flex;align-items:center;justify-content:center;font-size:30pt}
-.best h4{font-size:12.5pt;color:#a16207;margin-bottom:2mm}
+.best .noimg{width:52mm;height:52mm;border-radius:3mm;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:30pt}
+.best h4{font-size:12.5pt;color:var(--primary);margin-bottom:2mm}
 .best ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2mm}
 .best li{background:#fff;border-radius:2.5mm;padding:2mm 3mm;font-size:9pt;color:var(--muted)}
-.best li b{display:block;font-size:13pt;color:var(--ink)}
+.best li b{display:block;font-size:13pt;color:var(--primary)}
 .best p{font-size:9.5pt;line-height:1.55;margin-top:2.5mm}
 table.cmp{width:100%%;border-collapse:separate;border-spacing:0;font-size:10pt;border-radius:3mm;overflow:hidden}
 table.cmp th{background:var(--primary);color:#fff;padding:2.4mm 3mm;font-weight:700;text-align:right}
 table.cmp td{padding:2.4mm 3mm;background:var(--bg);border-bottom:1px solid #fff}
 .up{color:#15803d;font-weight:800;background:#dcfce7;border-radius:5mm;padding:.5mm 2.5mm}
 .down{color:#c81e1e;font-weight:800;background:#fee2e2;border-radius:5mm;padding:.5mm 2.5mm}
-.fb{border-right:5px solid #fb8c3c;background:#fff1e6;border-radius:3.5mm;padding:4mm 5mm}
+.fb{border-right:4px solid #fb8c3c;background:var(--bg);border-radius:3.5mm;padding:4mm 5mm}
 .fb .q{font-size:10.5pt;font-weight:700;margin-bottom:2mm}
 .fb ul{list-style:none;font-size:10pt;line-height:1.7}
 .fb li:before{content:"👉 "}
 ol.recs{list-style:none;display:flex;flex-direction:column;gap:2.5mm}
-ol.recs li{display:flex;gap:3mm;align-items:flex-start;font-size:10.5pt;line-height:1.6;background:var(--cbg);border-right:4px solid var(--c);border-radius:3.5mm;padding:2.8mm 4mm}
+ol.recs li{display:flex;gap:3mm;align-items:flex-start;font-size:10.5pt;line-height:1.6;background:var(--bg);border-radius:3.5mm;padding:2.8mm 4mm}
 ol.recs li .ri{flex:none;font-size:13pt;line-height:1.3}
-.next{display:flex;justify-content:space-between;align-items:center;gap:5mm;background:linear-gradient(135deg,#fb8c3c,#f59e0b);color:#fff;border-radius:5mm;padding:5mm 6mm}
+.next{display:flex;justify-content:space-between;align-items:center;gap:5mm;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:5mm;padding:5mm 6mm}
 .next h3{font-size:13pt;font-weight:800}
 .next p{font-size:10.5pt;line-height:1.6;margin-top:1mm}
-.next .price{flex:none;text-align:center;background:#fff;color:#c2410c;border-radius:3.5mm;padding:3mm 5mm}
+.next .price{flex:none;text-align:center;background:#fff;color:var(--primary);border-radius:3.5mm;padding:3mm 5mm}
 .next .price b{display:block;font-size:19pt;font-weight:800}
 .next .price small{font-size:9pt;color:var(--muted)}
 .thanks{text-align:center;margin-top:6mm;font-size:13pt;color:var(--primary);font-weight:800}
@@ -571,7 +566,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         every = 1 if len(pts) <= 15 else (2 if len(pts) <= 30 else 3)
         best = max(daily, key=lambda d: num(d.get("results")) or 0)
         B.append(blk(f'<div class="sec c-green"><h2>📅 النتائج يوماً بيوم</h2><div class="chart">'
-                     f'{svg_bars(pts, height=125, label_every=every, value_labels=len(pts) <= 16, color="#22c55e", base="#86b7fb", highlight_top=1)}</div>'
+                     f'{svg_bars(pts, height=125, label_every=every, value_labels=len(pts) <= 16, color="#22c55e", base="#5292B5", highlight_top=1)}</div>'
                      f'<p class="note">🏆 أفضل يوم كان <b><bdi>{fmt_date(best.get("date"))}</bdi></b> بـ '
                      f'{fmt(best.get("results"))} {esc(obj["unit"])}.</p></div>'))
 
@@ -600,7 +595,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
             if len(funnel) >= 3:
                 B.append(blk('<div class="sec c-blue"><h2>🎢 رحلة المشاهد مع الفيديو</h2><div class="chart" style="padding:4mm">'
                              + hbars(funnel, total=funnel[0][1],
-                                     colors=["#3b82f6", "#a78bfa", "#fb8c3c", "#facc15", "#22c55e"]) +
+                                     colors=["#146884", "#2a7a98", "#5292B5", "#76a9d6", "#8AB5F5"]) +
                              '<p class="note">كل سطر يوضح كم شخصاً بقي يشاهد في كل مرحلة، '
                              'والنسبة محسوبة من عدد الظهور.</p></div></div>'))
             if data.get("video_notes"):
@@ -615,7 +610,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         pts = [(f"{h:02d}", hmap.get(h, 0)) for h in range(24)]
         top = [t for t in sorted(pts, key=lambda t: -t[1])[:3] if t[1] > 0]
         B.append(blk(f'<div class="sec c-orange"><h2>⏰ أوقات الذروة</h2><div class="chart">'
-                     f'{svg_bars(pts, height=160, highlight_top=3, label_every=2, color="#fb8c3c", base="#fed7aa")}</div>'
+                     f'{svg_bars(pts, height=160, highlight_top=3, label_every=2, color="#fb8c3c", base="#AFD0FB")}</div>'
                      f'<p class="note">🔥 أكثر الساعات نشاطاً: <b>{"، ".join(f"<bdi>{t[0]}:00</bdi>" for t in top)}</b>. '
                      f'ننصحك بأن تكون متاحاً للرد في هذه الأوقات.</p></div>', new_page=np_flag))
         np_flag = False
@@ -625,10 +620,10 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         left = right = ""
         if plats:
             key = "reach" if all(x.get("reach") is not None for x in plats) else "results"
-            pcol = {"فيسبوك": "#1877f2", "facebook": "#1877f2", "إنستغرام": "#e1306c", "instagram": "#e1306c"}
+            pcol = {}
             left = (f'<div class="sec c-blue"><h2>📱 حسب المنصة</h2><div class="chart" style="padding:4mm">'
                     + hbars([(x["name"], num(x.get(key)) or 0) for x in plats],
-                            colors=[pcol.get(str(x["name"]).lower(), CYCLE[i]) for i, x in enumerate(plats)]) +
+                            colors=["#146884", "#8AB5F5", "#5292B5"]) +
                     f'<p class="note">حسب {"الوصول" if key == "reach" else "النتائج"}.</p></div></div>')
         if ag:
             right = ('<div class="sec c-purple"><h2>👥 العمر والجنس</h2><div class="chart" style="padding:4mm">'
@@ -780,11 +775,9 @@ def build_card_html(data: dict, agency: dict, c: dict) -> str:
                    f'&nbsp;&nbsp;|&nbsp;&nbsp;الوصول الفعلي: <b><bdi>{fmt_k(m["reach"])}</bdi></b> ✅</div>')
     contacts = agency["contacts"]
     themes = """
-    .c-blue{--c:#3b82f6;--ci:#1d4ed8;--cbg:#eaf2ff}.c-green{--c:#22c55e;--ci:#15803d;--cbg:#e8f9ee}
-    .c-orange{--c:#fb8c3c;--ci:#c2410c;--cbg:#fff1e6}.c-yellow{--c:#facc15;--ci:#a16207;--cbg:#fff9db}
-    .c-red{--c:#f05252;--ci:#c81e1e;--cbg:#fdecec}.c-purple{--c:#a78bfa;--ci:#6d28d9;--cbg:#f3eeff}
-    .c-teal{--c:#2dd4bf;--ci:#0f766e;--cbg:#e6fbf7}"""
-    rainbow = "linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6)"
+    .c-blue{--c:#3b82f6}.c-green{--c:#22c55e}.c-orange{--c:#fb8c3c}.c-yellow{--c:#facc15}
+    .c-red{--c:#f05252}.c-purple{--c:#a78bfa}.c-teal{--c:#2dd4bf}"""
+    rainbow = col["primary"]
     css = f"""
     {font_faces()}
     {themes}
@@ -797,15 +790,15 @@ def build_card_html(data: dict, agency: dict, c: dict) -> str:
     .head h1{{font-size:46px;font-weight:800;color:{col['primary']};line-height:1.2}}
     .head p{{font-size:31px;color:{col['secondary']};font-weight:700}}
     .meta{{margin-top:28px;display:flex;gap:14px}}
-    .meta span{{border-radius:40px;padding:10px 24px;font-size:24px;font-weight:700;background:var(--cbg);color:var(--ci)}}
+    .meta span{{border-radius:40px;padding:10px 24px;font-size:24px;font-weight:700;background:{col['background']};color:{col['primary']}}}
     .grid{{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:20px}}
-    .t{{position:relative;background:var(--cbg);border-radius:30px;padding:26px 32px;border-top:8px solid var(--c)}}
+    .t{{position:relative;background:{col['background']};border-radius:30px;padding:26px 32px;border-top:6px solid var(--c)}}
     .t .e{{position:absolute;left:28px;top:24px;font-size:50px}}
     .t small{{font-size:26px;font-weight:700;color:#5b6b7a}}
-    .t b{{display:block;font-size:62px;font-weight:800;color:var(--ci);line-height:1.2;margin-top:4px}}
+    .t b{{display:block;font-size:62px;font-weight:800;color:{col['primary']};line-height:1.2;margin-top:4px}}
     .pr{{margin-top:24px;background:#e8f9ee;border:3px solid #86efac;color:#15803d;border-radius:24px;padding:18px 26px;font-size:27px;font-weight:700;text-align:center}}
-    .sum{{margin-top:22px;font-size:28px;line-height:1.7;font-weight:500;background:#fff9db;border-radius:24px;padding:22px 30px;border-right:10px solid #facc15}}
-    .sum b{{color:#c2410c;font-weight:800}}
+    .sum{{margin-top:22px;font-size:28px;line-height:1.7;font-weight:500;background:{col['background']};border-radius:24px;padding:22px 30px;border-right:8px solid {col['primary']}}}
+    .sum b{{color:{col['primary']};font-weight:800}}
     .foot{{position:absolute;left:0;right:0;bottom:12px;height:100px;background:{col['primary']};color:#fff;display:flex;align-items:center;justify-content:center;gap:34px;font-size:24px;font-weight:500}}
     .foot b{{color:{col['soft']}}}
     .bot{{position:absolute;left:0;right:0;bottom:0;height:12px;background:{rainbow}}}

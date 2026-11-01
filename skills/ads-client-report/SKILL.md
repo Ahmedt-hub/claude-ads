@@ -24,6 +24,9 @@ DZD packages): `skills/ads-client-report/assets/agency.json`. Example input:
    badge appears only if actual reach ≥ the minimum; otherwise the renderer
    returns a warning: tell the agency owner privately, never the client.
 9. Do not ask about sales; clients usually don't share them.
+10. Visual style: fun and easy on the eye: colourful cards (green, orange, yellow, red,
+    blue, purple), emojis on every section and KPI, 🟢/🟡/🔴 rating badges. Red only for
+    negative signals.
 
 ## Workflow
 

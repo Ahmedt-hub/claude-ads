@@ -82,11 +82,25 @@ METRICS = {
 }
 
 GROUPS = [
-    ("الوصول والظهور", ["reach", "impressions", "frequency"]),
-    ("النتائج", ["messaging_conversations", "ig_profile_visits", "ig_follows", "fb_follows"]),
-    ("التفاعل", ["post_engagement", "reactions", "comments", "shares", "saves"]),
-    ("الضغطات", ["clicks_all", "link_clicks", "ctr_all", "link_ctr"]),
+    ("👀 الوصول والظهور", ["reach", "impressions", "frequency"], "blue"),
+    ("🎯 النتائج", ["messaging_conversations", "ig_profile_visits", "ig_follows", "fb_follows"], "green"),
+    ("❤️ التفاعل", ["post_engagement", "reactions", "comments", "shares", "saves"], "red"),
+    ("👆 الضغطات", ["clicks_all", "link_clicks", "ctr_all", "link_ctr"], "orange"),
 ]
+
+EMOJI = {
+    "reach": "👀", "impressions": "📺", "frequency": "🔁", "clicks_all": "👆", "link_clicks": "🔗",
+    "ctr_all": "📊", "link_ctr": "🎯", "messaging_conversations": "💬", "post_engagement": "🔥",
+    "reactions": "❤️", "comments": "🗨️", "shares": "🔄", "saves": "🔖", "ig_profile_visits": "📸",
+    "ig_follows": "➕", "fb_follows": "👍", "video_3s": "▶️", "thruplays": "🎬", "video_p50": "⏯️",
+    "video_p100": "🏁", "avg_watch_time": "⏱️", "hook_rate": "🪝", "hold_rate": "🧲",
+}
+OBJ_EMOJI = {"messages": "💬", "engagement": "🔥", "profile": "📸", "video": "🎬"}
+# colour of each metric card / tile
+KPI_COLOR = {"reach": "blue", "impressions": "purple", "frequency": "yellow", "link_clicks": "teal",
+             "thruplays": "red"}
+CYCLE = ["#3b82f6", "#22c55e", "#fb8c3c", "#facc15", "#a78bfa", "#2dd4bf", "#f472b6", "#f05252"]
+REC_STYLE = [("💡", "yellow"), ("🎯", "green"), ("⏰", "orange"), ("📣", "blue"), ("🚀", "purple"), ("✅", "teal")]
 VIDEO_KEYS = ["video_3s", "hook_rate", "thruplays", "hold_rate", "video_p50",
               "video_p100", "avg_watch_time"]
 
@@ -97,6 +111,8 @@ RATINGS = {
     "link_ctr": (1.0, 2.0),
     "ctr_all": (1.5, 3.0),
 }
+# lower is better: (excellent_max, good_max)
+RATINGS_LOW = {"frequency": (2.5, 4.0)}
 
 # ----------------------------------------------------------------------------
 # Helpers
@@ -154,14 +170,21 @@ def fmt_date(s: str) -> str:
 
 
 def rating(key: str, v: float | None) -> tuple[str, str] | None:
-    if v is None or key not in RATINGS:
+    if v is None:
+        return None
+    if key in RATINGS_LOW:
+        exc, good = RATINGS_LOW[key]
+        if v <= exc:
+            return ("🟢 ممتاز", "r-exc")
+        return ("🟡 جيد", "r-good") if v <= good else ("🔴 مرتفع", "r-low")
+    if key not in RATINGS:
         return None
     good, exc = RATINGS[key]
     if v >= exc:
-        return ("ممتاز", "r-exc")
+        return ("🟢 ممتاز", "r-exc")
     if v >= good:
-        return ("جيد", "r-good")
-    return ("يحتاج تحسين", "r-low")
+        return ("🟡 جيد", "r-good")
+    return ("🔴 يحتاج تحسين", "r-low")
 
 
 def b64_file(path: Path, mime: str) -> str:
@@ -270,7 +293,7 @@ def compute(data: dict, agency: dict) -> tuple[dict, list[str]]:
 
 
 def svg_bars(points: list[tuple[str, float]], width=680, height=210, color="#146884",
-             highlight_top=0, label_every=1, value_labels=True) -> str:
+             highlight_top=0, label_every=1, value_labels=True, base="#AFD0FB") -> str:
     if not points:
         return ""
     pad_l, pad_r, pad_t, pad_b = 8, 8, 22, 28
@@ -290,12 +313,12 @@ def svg_bars(points: list[tuple[str, float]], width=680, height=210, color="#146
         h = (height - pad_t - pad_b) * (v / vmax)
         x = pad_l + i * cw + (cw - bw) / 2
         y = base_y - h
-        fill = color if (not highlight_top or i in top_idx) else "#AFD0FB"
+        fill = color if (not highlight_top or i in top_idx) else base
         parts.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{max(h, 0.5):.1f}" '
                      f'rx="3" fill="{fill}"/>')
         if value_labels and v > 0 and (n <= 16 or i in top_idx):
             parts.append(f'<text x="{x + bw / 2:.1f}" y="{y - 5:.1f}" font-size="11" '
-                         f'text-anchor="middle" fill="#146884" font-weight="700">{fmt_k(v)}</text>')
+                         f'text-anchor="middle" fill="#1f2d3a" font-weight="700">{fmt_k(v)}</text>')
         if i % label_every == 0:
             parts.append(f'<text x="{x + bw / 2:.1f}" y="{height - 9}" font-size="10.5" '
                          f'text-anchor="middle" fill="#5b6b7a">{esc(lab)}</text>')
@@ -303,13 +326,15 @@ def svg_bars(points: list[tuple[str, float]], width=680, height=210, color="#146
     return "".join(parts)
 
 
-def hbars(rows: list[tuple[str, float]], total: float | None = None, color="var(--primary)") -> str:
+def hbars(rows: list[tuple[str, float]], total: float | None = None, colors: list[str] | None = None) -> str:
     if not rows:
         return ""
     vmax = max(v for _, v in rows) or 1
     tot = total or sum(v for _, v in rows) or 1
     out = ['<div class="hbars">']
-    for lab, v in rows:
+    colors = colors or CYCLE
+    for i, (lab, v) in enumerate(rows):
+        color = colors[i % len(colors)]
         out.append(
             f'<div class="hb-row"><div class="hb-lab">{esc(lab)}</div>'
             f'<div class="hb-track"><div class="hb-fill" style="width:{v / vmax * 100:.1f}%;background:{color}"></div></div>'
@@ -322,8 +347,8 @@ def age_gender_chart(rows: list[dict]) -> str:
     if not rows:
         return ""
     vmax = max(max(num(r.get("male")) or 0, num(r.get("female")) or 0) for r in rows) or 1
-    out = ['<div class="ag"><div class="ag-legend"><span class="dot gm"></span>رجال'
-           '<span class="dot gf"></span>نساء</div>']
+    out = ['<div class="ag"><div class="ag-legend"><span class="dot gm"></span>👨 رجال'
+           '<span class="dot gf"></span>👩 نساء</div>']
     for r in rows:
         mv, fv = num(r.get("male")) or 0, num(r.get("female")) or 0
         out.append(
@@ -343,101 +368,112 @@ def age_gender_chart(rows: list[dict]) -> str:
 
 CSS = """
 :root{--primary:%(primary)s;--secondary:%(secondary)s;--accent:%(accent)s;--soft:%(soft)s;--bg:%(background)s;
---ink:#16303d;--muted:#5b6b7a;--ok:#1f9d6b;--warn:#d9822b;--bad:#c94a4a;}
+--ink:#1f2d3a;--muted:#5b6b7a;--ok:#16a34a;--warn:#f08a24;--bad:#e5484d;}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#fff;color:var(--ink);font-family:'Tajawal',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Color Emoji',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 @page{size:A4;margin:0}
 .page{width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;background:#fff;padding:0 13mm 22mm;display:flex;flex-direction:column}
 .body{flex:1;min-height:0;overflow:hidden;margin:0 -13mm;padding:0 13mm}
 #src{position:absolute;left:-10000px;top:0;width:184mm;visibility:hidden}
-.chapter{font-size:16pt}.chapter span{font-size:9.5pt;color:var(--muted);font-weight:500;margin-inline-start:2mm}
-.grp{font-size:11.5pt;color:var(--secondary);font-weight:800;margin:0 0 2.5mm}
-.client strong.dates{font-size:10pt;line-height:1.5}
 .page:last-of-type{page-break-after:auto}
+/* colour themes */
+.c-blue{--c:#3b82f6;--ci:#1d4ed8;--cbg:#eaf2ff}
+.c-green{--c:#22c55e;--ci:#15803d;--cbg:#e8f9ee}
+.c-orange{--c:#fb8c3c;--ci:#c2410c;--cbg:#fff1e6}
+.c-yellow{--c:#facc15;--ci:#a16207;--cbg:#fff9db}
+.c-red{--c:#f05252;--ci:#c81e1e;--cbg:#fdecec}
+.c-purple{--c:#a78bfa;--ci:#6d28d9;--cbg:#f3eeff}
+.c-teal{--c:#2dd4bf;--ci:#0f766e;--cbg:#e6fbf7}
 .band{height:28mm;margin:0 -13mm 5mm;padding:0 13mm;display:flex;align-items:center;justify-content:space-between;
- background:linear-gradient(90deg,var(--bg) 0%%,var(--bg) 55%%,var(--soft) 100%%);border-bottom:3px solid var(--primary)}
+ background:linear-gradient(90deg,var(--bg) 0%%,var(--bg) 55%%,var(--soft) 100%%);border-bottom:4px solid transparent;
+ border-image:linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6) 1}
 .band img{height:19mm}
-.band .t{text-align:right}
 .band .t h1{font-size:20pt;font-weight:800;color:var(--primary);line-height:1.15}
-.band .t p{font-size:10.5pt;color:var(--secondary);font-weight:500}
+.band .t p{font-size:11pt;color:var(--secondary);font-weight:700}
 .mini-band{flex:none;height:16mm;margin:0 -13mm 6mm;padding:0 13mm;display:flex;align-items:center;justify-content:space-between;
- background:var(--bg);border-bottom:2px solid var(--primary)}
+ background:var(--bg);border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6) 1}
 .mini-band img{height:10mm}
 .mini-band span{font-size:11pt;color:var(--primary);font-weight:700}
 .footer{position:absolute;bottom:0;left:0;right:0;height:14mm;background:var(--primary);color:#fff;display:flex;
  align-items:center;justify-content:center;gap:5mm;font-size:9pt;font-weight:500;padding:0 8mm}
 .footer b{color:var(--soft);font-weight:700}
 .pn{position:absolute;bottom:17mm;left:13mm;font-size:8.5pt;color:var(--muted)}
-h2{font-size:14pt;color:var(--primary);font-weight:800;margin:0 0 3mm;display:flex;align-items:center;gap:2.5mm}
-h2:before{content:"";display:inline-block;width:4px;height:15pt;background:var(--accent);border-radius:2px}
-.sec{margin-bottom:6mm;break-inside:avoid}
+h2{font-size:14pt;color:var(--primary);font-weight:800;margin:0 0 3mm;display:flex;align-items:center;gap:2mm}
+.chapter{font-size:16pt}.chapter span{font-size:9.5pt;color:var(--muted);font-weight:500;margin-inline-start:2mm}
+.grp{font-size:12pt;color:var(--ci);font-weight:800;margin:0 0 2.5mm}
+.sec{margin-bottom:4.5mm;break-inside:avoid}
 .client{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-bottom:5mm}
-.client div{background:var(--bg);border-radius:3mm;padding:3mm 3.5mm}
+.client>div{background:var(--cbg);border-radius:3.5mm;padding:3mm 3.5mm;border-bottom:3px solid var(--c)}
 .client small{display:block;font-size:8.5pt;color:var(--muted)}
-.client strong{font-size:11.5pt;color:var(--primary);font-weight:700}
-.summary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:4mm;padding:4mm 6mm;margin-bottom:5mm}
-.summary h3{font-size:12pt;font-weight:800;color:var(--soft);margin-bottom:2mm}
+.client strong{font-size:11.5pt;color:var(--ci);font-weight:800}
+.client strong.dates{font-size:10pt;line-height:1.5}
+.summary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:5mm;padding:4mm 6mm;margin-bottom:5mm}
+.summary h3{font-size:12.5pt;font-weight:800;color:#fde68a;margin-bottom:1.5mm}
 .summary p{font-size:12pt;line-height:1.75;font-weight:500}
+.summary b{color:#fde68a}
 .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin-bottom:5mm}
-.kpi{border:1.5px solid var(--soft);border-radius:4mm;padding:3mm 3.5mm;background:#fff}
-.kpi.main{background:var(--bg);border-color:var(--primary)}
-.kpi small{font-size:9.5pt;color:var(--muted);font-weight:500}
-.kpi strong{display:block;font-size:20pt;color:var(--primary);font-weight:800;line-height:1.25}
+.kpi{position:relative;border-radius:4.5mm;padding:3mm 3.5mm;background:var(--cbg);border-top:5px solid var(--c)}
+.kpi .kic{position:absolute;left:3mm;top:3mm;font-size:17pt}
+.kpi small{font-size:9.5pt;color:var(--muted);font-weight:700}
+.kpi strong{display:block;font-size:20pt;color:var(--ci);font-weight:800;line-height:1.3}
 .kpi em{font-style:normal;font-size:8.5pt;color:var(--muted);line-height:1.45;display:block}
-.promise{display:flex;align-items:center;gap:5mm;border:1.5px dashed var(--secondary);border-radius:4mm;padding:3mm 5mm;margin-bottom:5mm}
-.promise .ic{width:10mm;height:10mm;border-radius:50%%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17pt;font-weight:800;flex:none}
+.promise{display:flex;align-items:center;gap:4mm;background:#e8f9ee;border:1.5px solid #86efac;border-radius:4mm;padding:3mm 5mm;margin-bottom:5mm}
+.promise .ic{font-size:20pt;flex:none}
 .promise p{font-size:11pt;line-height:1.6}
-.promise b{color:var(--primary)}
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm}
-.m{border-radius:3mm;background:var(--bg);padding:2.6mm 3.5mm;display:flex;flex-direction:column;gap:.6mm}
+.promise b{color:#15803d}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:2mm}
+.m{display:grid;grid-template-columns:9mm 1fr;gap:2.5mm;align-items:start;border-radius:3.5mm;background:var(--cbg);padding:2.2mm 3mm;border-right:4px solid var(--c)}
+.m .ic{width:9mm;height:9mm;border-radius:50%%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13pt}
 .m .top{display:flex;justify-content:space-between;align-items:baseline;gap:2mm}
 .m .lab{font-size:10pt;font-weight:700;color:var(--ink)}
-.m .val{font-size:14pt;font-weight:800;color:var(--primary);white-space:nowrap}
-.m .exp{font-size:8.6pt;color:var(--muted);line-height:1.45}
-.badge{font-size:8pt;font-weight:700;padding:.4mm 2mm;border-radius:6mm;margin-inline-start:1.5mm;vertical-align:middle}
-.r-exc{background:#d9f4e8;color:var(--ok)}.r-good{background:#e3eefc;color:var(--primary)}.r-low{background:#fde8e1;color:var(--bad)}
-.chart{background:var(--bg);border-radius:4mm;padding:3mm 4mm 1mm}
+.m .val{font-size:14pt;font-weight:800;color:var(--ci);white-space:nowrap}
+.m .exp{font-size:8.6pt;color:var(--muted);line-height:1.45;margin-top:.5mm}
+.badge{display:inline-block;font-size:7.8pt;font-weight:700;padding:.3mm 2mm;border-radius:6mm;margin-inline-start:1.5mm;vertical-align:middle}
+.r-exc{background:#dcfce7;color:#15803d}.r-good{background:#fef3c7;color:#a16207}.r-low{background:#fee2e2;color:#c81e1e}
+.chart{background:var(--cbg,var(--bg));border-radius:4mm;padding:3mm 4mm 1mm}
 .note{font-size:9.5pt;color:var(--muted);margin-top:1.5mm;line-height:1.55}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
 .hbars{display:flex;flex-direction:column;gap:2mm}
 .hb-row{display:grid;grid-template-columns:24mm 1fr 25mm;align-items:center;gap:2mm;font-size:9.5pt}
 .hb-lab{font-weight:700}
-.hb-track{height:4.2mm;background:#fff;border-radius:2mm;overflow:hidden}
-.hb-fill{height:100%%;border-radius:2mm}
-.hb-val{font-weight:700;color:var(--primary);font-size:9.5pt}.hb-val span{color:var(--muted);font-weight:500;font-size:8.5pt}
-.ag-legend{font-size:9pt;color:var(--muted);display:flex;align-items:center;gap:1.5mm;margin-bottom:2mm}
+.hb-track{height:4.6mm;background:#fff;border-radius:2.3mm;overflow:hidden}
+.hb-fill{height:100%%;border-radius:2.3mm}
+.hb-val{font-weight:800;color:var(--ink);font-size:9.5pt}.hb-val span{color:var(--muted);font-weight:500;font-size:8.5pt}
+.ag-legend{font-size:9.5pt;color:var(--muted);display:flex;align-items:center;gap:1.5mm;margin-bottom:2mm}
 .dot{width:3mm;height:3mm;border-radius:50%%;display:inline-block;margin-inline-start:3mm}
-.dot.gm,.ag-bar.gm{background:var(--primary)}.dot.gf,.ag-bar.gf{background:var(--accent)}
+.dot.gm,.ag-bar.gm{background:#3b82f6}.dot.gf,.ag-bar.gf{background:#f472b6}
 .ag-row{display:grid;grid-template-columns:13mm 1fr;align-items:center;gap:2mm;margin-bottom:1.6mm}
 .ag-lab{font-size:9.5pt;font-weight:700}
 .ag-bars{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.5mm;font-size:8pt;color:var(--muted)}
-.ag-bar{height:2.6mm;border-radius:1.3mm;min-width:.6mm}
+.ag-bar{height:2.8mm;border-radius:1.4mm;min-width:.6mm}
 .ag-break{flex-basis:100%%;height:.8mm}
-.best{display:grid;grid-template-columns:52mm 1fr;gap:5mm;background:var(--bg);border-radius:4mm;padding:4mm}
+.best{display:grid;grid-template-columns:52mm 1fr;gap:5mm;background:#fff9db;border:2px solid #fde68a;border-radius:4mm;padding:4mm}
 .best img{width:52mm;height:52mm;object-fit:cover;border-radius:3mm;background:#fff}
-.best .noimg{width:52mm;height:52mm;border-radius:3mm;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700}
-.best h4{font-size:12pt;color:var(--primary);margin-bottom:2mm}
+.best .noimg{width:52mm;height:52mm;border-radius:3mm;background:#fde68a;display:flex;align-items:center;justify-content:center;font-size:30pt}
+.best h4{font-size:12.5pt;color:#a16207;margin-bottom:2mm}
 .best ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2mm}
 .best li{background:#fff;border-radius:2.5mm;padding:2mm 3mm;font-size:9pt;color:var(--muted)}
-.best li b{display:block;font-size:13pt;color:var(--primary)}
+.best li b{display:block;font-size:13pt;color:var(--ink)}
 .best p{font-size:9.5pt;line-height:1.55;margin-top:2.5mm}
 table.cmp{width:100%%;border-collapse:separate;border-spacing:0;font-size:10pt;border-radius:3mm;overflow:hidden}
 table.cmp th{background:var(--primary);color:#fff;padding:2.4mm 3mm;font-weight:700;text-align:right}
 table.cmp td{padding:2.4mm 3mm;background:var(--bg);border-bottom:1px solid #fff}
-.up{color:var(--ok);font-weight:800}.down{color:var(--bad);font-weight:800}
-.fb{border-right:4px solid var(--warn);background:#fff7ee;border-radius:3mm;padding:4mm 5mm}
+.up{color:#15803d;font-weight:800;background:#dcfce7;border-radius:5mm;padding:.5mm 2.5mm}
+.down{color:#c81e1e;font-weight:800;background:#fee2e2;border-radius:5mm;padding:.5mm 2.5mm}
+.fb{border-right:5px solid #fb8c3c;background:#fff1e6;border-radius:3.5mm;padding:4mm 5mm}
 .fb .q{font-size:10.5pt;font-weight:700;margin-bottom:2mm}
-.fb ul{padding-right:5mm;font-size:10pt;line-height:1.7}
-ol.recs{list-style:none;counter-reset:r;display:flex;flex-direction:column;gap:2.5mm}
-ol.recs li{counter-increment:r;display:flex;gap:3mm;align-items:flex-start;font-size:10.5pt;line-height:1.6;background:var(--bg);border-radius:3mm;padding:2.8mm 4mm}
-ol.recs li:before{content:counter(r);flex:none;width:6.5mm;height:6.5mm;border-radius:50%%;background:var(--primary);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:10pt;margin-top:.4mm}
-.next{display:flex;justify-content:space-between;align-items:center;gap:5mm;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:4mm;padding:5mm 6mm}
-.next h3{font-size:13pt;font-weight:800;color:var(--soft)}
+.fb ul{list-style:none;font-size:10pt;line-height:1.7}
+.fb li:before{content:"👉 "}
+ol.recs{list-style:none;display:flex;flex-direction:column;gap:2.5mm}
+ol.recs li{display:flex;gap:3mm;align-items:flex-start;font-size:10.5pt;line-height:1.6;background:var(--cbg);border-right:4px solid var(--c);border-radius:3.5mm;padding:2.8mm 4mm}
+ol.recs li .ri{flex:none;font-size:13pt;line-height:1.3}
+.next{display:flex;justify-content:space-between;align-items:center;gap:5mm;background:linear-gradient(135deg,#fb8c3c,#f59e0b);color:#fff;border-radius:5mm;padding:5mm 6mm}
+.next h3{font-size:13pt;font-weight:800}
 .next p{font-size:10.5pt;line-height:1.6;margin-top:1mm}
-.next .price{flex:none;text-align:center;background:#fff;color:var(--primary);border-radius:3.5mm;padding:3mm 5mm}
+.next .price{flex:none;text-align:center;background:#fff;color:#c2410c;border-radius:3.5mm;padding:3mm 5mm}
 .next .price b{display:block;font-size:19pt;font-weight:800}
 .next .price small{font-size:9pt;color:var(--muted)}
-.thanks{text-align:center;margin-top:6mm;font-size:12pt;color:var(--primary);font-weight:700}
+.thanks{text-align:center;margin-top:6mm;font-size:13pt;color:var(--primary);font-weight:800}
 """
 
 
@@ -449,24 +485,30 @@ def footer_html(agency: dict) -> str:
             f'<span dir="ltr">📞 {esc(phones)}</span><span>📍 {esc(c["address"])}</span></div>')
 
 
-def metric_card(key: str, m: dict) -> str:
+def metric_card(key: str, m: dict, color: str = "blue") -> str:
     if key not in METRICS or m.get(key) is None:
         return ""
     label, exp, kind = METRICS[key]
     v = num(m[key])
     r = rating(key, v)
     badge = f'<span class="badge {r[1]}">{r[0]}</span>' if r else ""
-    return (f'<div class="m"><div class="top"><span class="lab">{esc(label)}{badge}</span>'
-            f'<span class="val">{fmt(v, kind)}</span></div><div class="exp">{esc(exp)}</div></div>')
+    return (f'<div class="m c-{color}"><div class="ic">{EMOJI.get(key, "📌")}</div><div>'
+            f'<div class="top"><span class="lab">{esc(label)}{badge}</span>'
+            f'<span class="val">{fmt(v, kind)}</span></div><div class="exp">{esc(exp)}</div></div></div>')
+
+
+def rec_li(text: str, i: int) -> str:
+    icon, col = REC_STYLE[i % len(REC_STYLE)]
+    return f'<li class="c-{col}"><span class="ri">{icon}</span><span>{esc(text)}</span></li>'
 
 
 def auto_summary(data: dict, c: dict) -> str:
     m, obj = c["metrics"], c["objective"]
     parts = []
     if m.get("reach") is not None:
-        parts.append(f"وصل إعلانك إلى <b>{fmt(m['reach'])}</b> شخص وظهر <b>{fmt(m.get('impressions'))}</b> مرة.")
+        parts.append(f"👀 وصل إعلانك إلى <b>{fmt(m['reach'])}</b> شخص وظهر <b>{fmt(m.get('impressions'))}</b> مرة.")
     if c["results"]:
-        parts.append(f"حققت الحملة <b>{fmt(c['results'])}</b> {obj['unit']}، "
+        parts.append(f"🎯 حققت الحملة <b>{fmt(c['results'])}</b> {obj['unit']}، "
                      f"أي أن كل {obj['unit']} كلّفتك حوالي <b>{fmt(c['cpr'], 'dzd')}</b> فقط.")
     return " ".join(parts)
 
@@ -485,36 +527,38 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     B: list[str] = []
 
     # ---------------- Overview ----------------
-    B.append(blk(f'<div class="band"><div class="t"><h1>تقرير نتائج الحملة الإعلانية</h1>'
+    B.append(blk(f'<div class="band"><div class="t"><h1>📊 تقرير نتائج الحملة الإعلانية</h1>'
                  f'<p>{esc(title)}</p></div><img src="{logo}" alt=""></div>'))
     B.append(blk(
         '<div class="client">'
-        f'<div><small>العميل</small><strong>{esc(title)}</strong></div>'
-        f'<div><small>هدف الحملة</small><strong>{esc(obj["label"])}</strong></div>'
-        f'<div><small>الباقة</small><strong>{esc(pkg["tier"])} <bdi>· {pkg["days"]} أيام</bdi></strong></div>'
-        f'<div><small>المدة</small><strong class="dates">من <bdi>{fmt_date(data.get("start_date"))}</bdi>'
+        f'<div class="c-blue"><small>👤 العميل</small><strong>{esc(title)}</strong></div>'
+        f'<div class="c-green"><small>🎯 هدف الحملة</small><strong>{esc(obj["label"])}</strong></div>'
+        f'<div class="c-orange"><small>📦 الباقة</small><strong>{esc(pkg["tier"])} <bdi>· {pkg["days"]} أيام</bdi></strong></div>'
+        f'<div class="c-purple"><small>📅 المدة</small><strong class="dates">من <bdi>{fmt_date(data.get("start_date"))}</bdi>'
         f'<br>إلى <bdi>{fmt_date(data.get("end_date"))}</bdi></strong></div></div>'))
     summ = data.get("summary") or auto_summary(data, c)
-    B.append(blk(f'<div class="summary"><h3>باختصار</h3><p>{summ}</p></div>'))
+    B.append(blk(f'<div class="summary"><h3>✨ باختصار</h3><p>{summ}</p></div>'))
 
     hero = []
     if c["results"] is not None:
-        hero.append(f'<div class="kpi main"><small>{esc(METRICS[obj["result_key"]][0])}</small>'
+        hero.append(f'<div class="kpi c-green"><span class="kic">{OBJ_EMOJI.get(data.get("objective"), "🎯")}</span>'
+                    f'<small>{esc(METRICS[obj["result_key"]][0])}</small>'
                     f'<strong>{fmt(c["results"])}</strong><em>{esc(METRICS[obj["result_key"]][1])}</em></div>')
     if c["cpr"]:
-        hero.append(f'<div class="kpi main"><small>تكلفة {esc(obj["unit"])} الواحدة</small>'
+        hero.append(f'<div class="kpi c-orange"><span class="kic">💰</span><small>تكلفة {esc(obj["unit"])} الواحدة</small>'
                     f'<strong>{fmt(c["cpr"], "dzd")}</strong>'
                     f'<em>سعر الباقة ({fmt(pkg["price"], "dzd")}) مقسوماً على عدد النتائج.</em></div>')
     for k in ["reach", "impressions", "frequency", "link_clicks"]:
         if m.get(k) is not None and len(hero) < 6:
             lab, exp, kind = METRICS[k]
-            hero.append(f'<div class="kpi"><small>{esc(lab)}</small><strong>{fmt(m[k], kind)}</strong>'
+            hero.append(f'<div class="kpi c-{KPI_COLOR.get(k, "blue")}"><span class="kic">{EMOJI[k]}</span>'
+                        f'<small>{esc(lab)}</small><strong>{fmt(m[k], kind)}</strong>'
                         f'<em>{esc(exp)}</em></div>')
     B.append(blk('<div class="hero">' + "".join(hero) + "</div>"))
 
     if c["reach_ok"]:
         lo, hi = pkg["est_reach"]
-        B.append(blk(f'<div class="promise"><div class="ic">✓</div><p>الوصول المتوقع لباقتك كان بين '
+        B.append(blk(f'<div class="promise"><div class="ic">🎉</div><p>الوصول المتوقع لباقتك كان بين '
                      f'<b>{fmt(lo)}</b> و<b>{fmt(hi)}</b> شخص، وإعلانك وصل فعلياً إلى '
                      f'<b>{fmt(m["reach"])}</b> شخص.</p></div>'))
 
@@ -526,39 +570,42 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
             pts.append((dd.strftime("%d/%m") if dd else str(d.get("date")), num(d.get("results")) or 0))
         every = 1 if len(pts) <= 15 else (2 if len(pts) <= 30 else 3)
         best = max(daily, key=lambda d: num(d.get("results")) or 0)
-        B.append(blk(f'<div class="sec"><h2>النتائج يوماً بيوم</h2><div class="chart">'
-                     f'{svg_bars(pts, height=125, label_every=every, value_labels=len(pts) <= 16)}</div>'
-                     f'<p class="note">أفضل يوم كان <b><bdi>{fmt_date(best.get("date"))}</bdi></b> بـ '
+        B.append(blk(f'<div class="sec c-green"><h2>📅 النتائج يوماً بيوم</h2><div class="chart">'
+                     f'{svg_bars(pts, height=125, label_every=every, value_labels=len(pts) <= 16, color="#22c55e", base="#86b7fb", highlight_top=1)}</div>'
+                     f'<p class="note">🏆 أفضل يوم كان <b><bdi>{fmt_date(best.get("date"))}</bdi></b> بـ '
                      f'{fmt(best.get("results"))} {esc(obj["unit"])}.</p></div>'))
 
     # ---------------- Detailed metrics ----------------
     first = True
-    for gname, keys in GROUPS:
-        cards = "".join(metric_card(k, m) for k in keys)
+    for gname, keys, gcol in GROUPS:
+        cards = "".join(metric_card(k, m, gcol) for k in keys)
         if cards:
-            head = ('<h2 class="chapter">تفاصيل النتائج <span>كل رقم مع شرح بسيط لمعناه</span></h2>'
+            head = ('<h2 class="chapter">📊 تفاصيل النتائج <span>كل رقم مع شرح بسيط لمعناه</span></h2>'
                     if first else "")
-            B.append(blk(f'{head}<div class="sec"><h3 class="grp">{esc(gname)}</h3>'
+            B.append(blk(f'{head}<div class="sec c-{gcol}"><h3 class="grp">{esc(gname)}</h3>'
                          f'<div class="mgrid">{cards}</div></div>', new_page=first))
             first = False
 
     # ---------------- Video ----------------
     if data.get("is_video"):
-        cards = "".join(metric_card(k, m) for k in VIDEO_KEYS)
+        vcol = {"video_3s": "blue", "hook_rate": "orange", "thruplays": "green", "hold_rate": "purple",
+                "video_p50": "teal", "video_p100": "green", "avg_watch_time": "yellow"}
+        cards = "".join(metric_card(k, m, vcol[k]) for k in VIDEO_KEYS)
         if cards:
-            B.append(blk(f'<div class="sec"><h2>أداء الفيديو</h2><div class="mgrid">{cards}</div></div>',
+            B.append(blk(f'<div class="sec"><h2>🎬 أداء الفيديو</h2><div class="mgrid">{cards}</div></div>',
                          new_page=True))
             funnel = [(lab, num(m.get(k))) for lab, k in
                       [("الظهور", "impressions"), ("3 ثوانٍ", "video_3s"), ("ThruPlay", "thruplays"),
                        ("50%", "video_p50"), ("100%", "video_p100")] if m.get(k) is not None]
             if len(funnel) >= 3:
-                B.append(blk('<div class="sec"><h2>رحلة المشاهد مع الفيديو</h2><div class="chart" style="padding:4mm">'
-                             + hbars(funnel, total=funnel[0][1]) +
+                B.append(blk('<div class="sec c-blue"><h2>🎢 رحلة المشاهد مع الفيديو</h2><div class="chart" style="padding:4mm">'
+                             + hbars(funnel, total=funnel[0][1],
+                                     colors=["#3b82f6", "#a78bfa", "#fb8c3c", "#facc15", "#22c55e"]) +
                              '<p class="note">كل سطر يوضح كم شخصاً بقي يشاهد في كل مرحلة، '
                              'والنسبة محسوبة من عدد الظهور.</p></div></div>'))
             if data.get("video_notes"):
-                B.append(blk('<div class="sec"><h2>قراءتنا للفيديو</h2><ol class="recs">'
-                             + "".join(f"<li>{esc(t)}</li>" for t in data["video_notes"]) + "</ol></div>"))
+                B.append(blk('<div class="sec"><h2>🧐 قراءتنا للفيديو</h2><ol class="recs">'
+                             + "".join(rec_li(t, i) for i, t in enumerate(data["video_notes"])) + "</ol></div>"))
 
     # ---------------- Audience & timing ----------------
     np_flag = True
@@ -567,9 +614,9 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         hmap = {int(h.get("hour", 0)): num(h.get("results")) or 0 for h in hourly}
         pts = [(f"{h:02d}", hmap.get(h, 0)) for h in range(24)]
         top = [t for t in sorted(pts, key=lambda t: -t[1])[:3] if t[1] > 0]
-        B.append(blk(f'<div class="sec"><h2>أوقات الذروة</h2><div class="chart">'
-                     f'{svg_bars(pts, height=160, highlight_top=3, label_every=2)}</div>'
-                     f'<p class="note">أكثر الساعات نشاطاً: <b>{"، ".join(f"<bdi>{t[0]}:00</bdi>" for t in top)}</b>. '
+        B.append(blk(f'<div class="sec c-orange"><h2>⏰ أوقات الذروة</h2><div class="chart">'
+                     f'{svg_bars(pts, height=160, highlight_top=3, label_every=2, color="#fb8c3c", base="#fed7aa")}</div>'
+                     f'<p class="note">🔥 أكثر الساعات نشاطاً: <b>{"، ".join(f"<bdi>{t[0]}:00</bdi>" for t in top)}</b>. '
                      f'ننصحك بأن تكون متاحاً للرد في هذه الأوقات.</p></div>', new_page=np_flag))
         np_flag = False
     plats = data.get("platforms") or []
@@ -578,11 +625,13 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         left = right = ""
         if plats:
             key = "reach" if all(x.get("reach") is not None for x in plats) else "results"
-            left = (f'<div class="sec"><h2>حسب المنصة</h2><div class="chart" style="padding:4mm">'
-                    + hbars([(x["name"], num(x.get(key)) or 0) for x in plats]) +
+            pcol = {"فيسبوك": "#1877f2", "facebook": "#1877f2", "إنستغرام": "#e1306c", "instagram": "#e1306c"}
+            left = (f'<div class="sec c-blue"><h2>📱 حسب المنصة</h2><div class="chart" style="padding:4mm">'
+                    + hbars([(x["name"], num(x.get(key)) or 0) for x in plats],
+                            colors=[pcol.get(str(x["name"]).lower(), CYCLE[i]) for i, x in enumerate(plats)]) +
                     f'<p class="note">حسب {"الوصول" if key == "reach" else "النتائج"}.</p></div></div>')
         if ag:
-            right = ('<div class="sec"><h2>العمر والجنس</h2><div class="chart" style="padding:4mm">'
+            right = ('<div class="sec c-purple"><h2>👥 العمر والجنس</h2><div class="chart" style="padding:4mm">'
                      + age_gender_chart(ag) + '</div></div>')
         B.append(blk(f'<div class="two">{left}{right}</div>', new_page=np_flag))
         np_flag = False
@@ -590,7 +639,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     if regions:
         rows = sorted(((r["name"], num(r.get("reach") or r.get("results")) or 0) for r in regions),
                       key=lambda t: -t[1])[:8]
-        B.append(blk('<div class="sec"><h2>حسب الولاية</h2><div class="chart" style="padding:4mm">'
+        B.append(blk('<div class="sec c-teal"><h2>📍 حسب الولاية</h2><div class="chart" style="padding:4mm">'
                      + hbars(rows) + '</div></div>', new_page=np_flag))
         np_flag = False
 
@@ -600,7 +649,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     if len(ads) > 1:
         best = max(ads, key=lambda a: num(a.get("results")) or 0)
         src = image_src(best.get("thumbnail"), base)
-        img = f'<img src="{src}" alt="">' if src else '<div class="noimg">الإعلان</div>'
+        img = f'<img src="{src}" alt="">' if src else '<div class="noimg">🏆</div>'
         li = []
         if best.get("results") is not None:
             li.append(f'<li><b>{fmt(best["results"])}</b>{esc(obj["unit"])}</li>')
@@ -608,7 +657,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
             if best.get(k) is not None:
                 li.append(f'<li><b>{fmt(best[k], METRICS[k][2])}</b>{esc(METRICS[k][0])}</li>')
         why = f'<p>{esc(best["why"])}</p>' if best.get("why") else ""
-        B.append(blk(f'<div class="sec"><h2>أفضل إعلان في الحملة</h2><div class="best">{img}<div>'
+        B.append(blk(f'<div class="sec"><h2>🏆 أفضل إعلان في الحملة</h2><div class="best">{img}<div>'
                      f'<h4>{esc(best.get("name", ""))}</h4><ul>{"".join(li)}</ul>{why}</div></div></div>',
                      new_page=np_flag))
         np_flag = False
@@ -619,7 +668,8 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
                 return "—"
             good = (v < 0) if lower_better else (v > 0)
             arrow = "▲" if v > 0 else "▼"
-            return f'<span class="{"up" if good else "down"}">{arrow} {abs(v):.0f}%</span>'
+            icon = "✅" if good else "⚠️"
+            return f'<span class="{"up" if good else "down"}">{icon} {arrow} {abs(v):.0f}%</span>'
         rows = [
             ("الباقة", f'{comp["package"]["tier"]} <bdi>· {comp["package"]["days"]} أيام</bdi>',
              f'{pkg["tier"]} <bdi>· {pkg["days"]} أيام</bdi>', "—"),
@@ -631,7 +681,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
         ]
         body = "".join(f"<tr><td><b>{esc(a)}</b></td><td>{b}</td><td>{cc}</td><td>{d}</td></tr>"
                        for a, b, cc, d in rows)
-        B.append(blk('<div class="sec"><h2>مقارنة مع حملتك السابقة</h2><table class="cmp"><thead><tr>'
+        B.append(blk('<div class="sec"><h2>📈 مقارنة مع حملتك السابقة</h2><table class="cmp"><thead><tr>'
                      '<th>المؤشر</th><th>الحملة السابقة</th><th>هذه الحملة</th><th>التغيّر</th></tr></thead>'
                      f'<tbody>{body}</tbody></table>'
                      '<p class="note">التكلفة محسوبة من سعر الباقة في كل حملة.</p></div>', new_page=np_flag))
@@ -639,21 +689,21 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     fb = data.get("client_feedback")
     if fb and fb.get("note"):
         reasons = "".join(f"<li>{esc(r)}</li>" for r in fb.get("analysis", []))
-        B.append(blk(f'<div class="sec"><h2>بخصوص ملاحظتك</h2><div class="fb"><div class="q">«{esc(fb["note"])}»</div>'
+        B.append(blk(f'<div class="sec"><h2>💡 بخصوص ملاحظتك</h2><div class="fb"><div class="q">🗣️ «{esc(fb["note"])}»</div>'
                      f'<ul>{reasons}</ul></div></div>', new_page=np_flag))
         np_flag = False
     recs = data.get("recommendations") or []
     if recs:
-        B.append(blk('<div class="sec"><h2>توصياتنا للحملة القادمة</h2><ol class="recs">'
-                     + "".join(f"<li>{esc(r)}</li>" for r in recs[:6]) + "</ol></div>", new_page=np_flag))
+        B.append(blk('<div class="sec"><h2>🚀 توصياتنا للحملة القادمة</h2><ol class="recs">'
+                     + "".join(rec_li(r, i) for i, r in enumerate(recs[:6])) + "</ol></div>", new_page=np_flag))
         np_flag = False
     nxt = data.get("next_package")
     if nxt:
         np_ = lookup_package(agency, nxt)
         lo, hi = np_["est_reach"]
-        B.append(blk(f'<div class="sec"><div class="next"><div><h3>الباقة المقترحة لك: {esc(np_["tier"])} '
+        B.append(blk(f'<div class="sec"><div class="next"><div><h3>🎁 الباقة المقترحة لك: {esc(np_["tier"])} '
                      f'<bdi>· {np_["days"]} أيام</bdi></h3>'
-                     f'<p>{esc(nxt.get("reason", ""))}<br>الوصول المتوقع: <bdi>{fmt(lo)} – {fmt(hi)}</bdi> شخص.</p></div>'
+                     f'<p>{esc(nxt.get("reason", ""))}<br>👀 الوصول المتوقع: <bdi>{fmt(lo)} – {fmt(hi)}</bdi> شخص.</p></div>'
                      f'<div class="price"><b>{fmt(np_["price"], "dzd")}</b><small>{np_["days"]} أيام</small></div>'
                      f'</div></div>', new_page=np_flag))
     B.append(blk(f'<div class="thanks">شكراً لثقتك في {esc(agency["agency_name"])} 💙</div>'))
@@ -697,7 +747,7 @@ def build_report_html(data: dict, agency: dict, c: dict, base: Path) -> str:
     title = esc(data.get("client_name", ""))
     blocks = "".join(build_blocks(data, agency, c, base))
     tpl = (f'<template id="tpl-page"><section class="page">'
-           f'<div class="mini-band"><span>تقرير الحملة · {title}</span><img src="{logo}" alt=""></div>'
+           f'<div class="mini-band"><span>📊 تقرير الحملة · {title}</span><img src="{logo}" alt=""></div>'
            f'<div class="body"></div><div class="pn" dir="ltr"></div>{footer_html(agency)}</section></template>')
     return (f'<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">'
             f'<title>تقرير {title}</title><style>{font_faces()}{css}</style></head><body>'
@@ -709,59 +759,68 @@ def build_card_html(data: dict, agency: dict, c: dict) -> str:
     m, obj, pkg = c["metrics"], c["objective"], c["package"]
     col = agency["colors"]
     logo = image_src(agency["logo"], ASSETS)
-    tiles = []
+    tiles = []  # (emoji, label, value, colour)
     if c["results"] is not None:
-        tiles.append((METRICS[obj["result_key"]][0], fmt(c["results"]), True))
+        tiles.append((OBJ_EMOJI.get(data.get("objective"), "🎯"), METRICS[obj["result_key"]][0],
+                      fmt(c["results"]), "green"))
     if c["cpr"]:
-        tiles.append((f"تكلفة {obj['unit']} الواحدة", fmt(c["cpr"], "dzd"), True))
+        tiles.append(("💰", f"تكلفة {obj['unit']} الواحدة", fmt(c["cpr"], "dzd"), "orange"))
     for k in ["reach", "impressions", "link_clicks", "frequency"]:
         if m.get(k) is not None and len(tiles) < 6:
-            tiles.append((METRICS[k][0], fmt(m[k], METRICS[k][2]), False))
+            tiles.append((EMOJI[k], METRICS[k][0], fmt(m[k], METRICS[k][2]), KPI_COLOR.get(k, "blue")))
     if data.get("is_video") and m.get("thruplays") is not None and len(tiles) < 6:
-        tiles.append(("المشاهدات الكاملة", fmt(m["thruplays"]), False))
+        tiles.append(("🎬", "المشاهدات الكاملة", fmt(m["thruplays"]), "red"))
     tiles_html = "".join(
-        f'<div class="t{" hi" if hi else ""}"><small>{esc(a)}</small><b>{esc(b)}</b></div>' for a, b, hi in tiles)
+        f'<div class="t c-{cl}"><span class="e">{e}</span><small>{esc(a)}</small><b>{esc(v)}</b></div>'
+        for e, a, v, cl in tiles)
     promise = ""
     if c["reach_ok"]:
         lo, hi = pkg["est_reach"]
-        promise = (f'<div class="pr">✓ الوصول المتوقع للباقة: <bdi dir="ltr">{fmt_k(lo)} – {fmt_k(hi)}</bdi>'
-                   f'&nbsp;&nbsp;|&nbsp;&nbsp;الوصول الفعلي: <b><bdi>{fmt_k(m["reach"])}</bdi></b></div>')
+        promise = (f'<div class="pr">🎉 الوصول المتوقع للباقة: <bdi dir="ltr">{fmt_k(lo)} – {fmt_k(hi)}</bdi>'
+                   f'&nbsp;&nbsp;|&nbsp;&nbsp;الوصول الفعلي: <b><bdi>{fmt_k(m["reach"])}</bdi></b> ✅</div>')
     contacts = agency["contacts"]
+    themes = """
+    .c-blue{--c:#3b82f6;--ci:#1d4ed8;--cbg:#eaf2ff}.c-green{--c:#22c55e;--ci:#15803d;--cbg:#e8f9ee}
+    .c-orange{--c:#fb8c3c;--ci:#c2410c;--cbg:#fff1e6}.c-yellow{--c:#facc15;--ci:#a16207;--cbg:#fff9db}
+    .c-red{--c:#f05252;--ci:#c81e1e;--cbg:#fdecec}.c-purple{--c:#a78bfa;--ci:#6d28d9;--cbg:#f3eeff}
+    .c-teal{--c:#2dd4bf;--ci:#0f766e;--cbg:#e6fbf7}"""
+    rainbow = "linear-gradient(90deg,#22c55e,#facc15,#fb8c3c,#f05252,#3b82f6)"
     css = f"""
     {font_faces()}
+    {themes}
     *{{box-sizing:border-box;margin:0;padding:0}}
-    body{{width:1080px;height:1350px;font-family:'Tajawal';background:{col['background']};color:#16303d;overflow:hidden}}
-    .wrap{{position:relative;height:100%;padding:60px 64px}}
+    body{{width:1080px;height:1350px;font-family:'Tajawal','Noto Color Emoji';background:#fff;color:#1f2d3a;overflow:hidden}}
+    .top{{height:12px;background:{rainbow}}}
+    .wrap{{position:relative;height:100%;padding:44px 64px}}
     .head{{display:flex;justify-content:space-between;align-items:center}}
-    .head img{{height:120px}}
+    .head img{{height:115px}}
     .head h1{{font-size:46px;font-weight:800;color:{col['primary']};line-height:1.2}}
-    .head p{{font-size:30px;color:{col['secondary']};font-weight:700}}
-    .meta{{margin-top:34px;display:flex;gap:16px}}
-    .meta span{{background:#fff;border:2px solid {col['soft']};border-radius:40px;padding:10px 26px;font-size:24px;font-weight:700;color:{col['primary']}}}
-    .grid{{margin-top:38px;display:grid;grid-template-columns:1fr 1fr;gap:22px}}
-    .t{{background:#fff;border-radius:28px;padding:30px 34px;border:2px solid {col['soft']}}}
-    .t.hi{{background:linear-gradient(135deg,{col['primary']},{col['secondary']});border:none;color:#fff}}
-    .t small{{font-size:26px;font-weight:500;color:#5b6b7a}}
-    .t.hi small{{color:{col['soft']}}}
-    .t b{{display:block;font-size:64px;font-weight:800;color:{col['primary']};line-height:1.15;margin-top:6px}}
-    .t.hi b{{color:#fff}}
-    .pr{{margin-top:28px;background:#d9f4e8;color:#1f7d56;border-radius:22px;padding:20px 28px;font-size:27px;font-weight:700;text-align:center}}
-    .sum{{margin-top:26px;font-size:29px;line-height:1.7;font-weight:500;color:#16303d;background:#fff;border-radius:24px;padding:24px 32px;border-right:8px solid {col['primary']}}}
-    .sum b{{color:{col['primary']};font-weight:800}}
-    .foot{{position:absolute;left:0;right:0;bottom:0;height:110px;background:{col['primary']};color:#fff;display:flex;align-items:center;justify-content:center;gap:34px;font-size:24px;font-weight:500}}
+    .head p{{font-size:31px;color:{col['secondary']};font-weight:700}}
+    .meta{{margin-top:28px;display:flex;gap:14px}}
+    .meta span{{border-radius:40px;padding:10px 24px;font-size:24px;font-weight:700;background:var(--cbg);color:var(--ci)}}
+    .grid{{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+    .t{{position:relative;background:var(--cbg);border-radius:30px;padding:26px 32px;border-top:8px solid var(--c)}}
+    .t .e{{position:absolute;left:28px;top:24px;font-size:50px}}
+    .t small{{font-size:26px;font-weight:700;color:#5b6b7a}}
+    .t b{{display:block;font-size:62px;font-weight:800;color:var(--ci);line-height:1.2;margin-top:4px}}
+    .pr{{margin-top:24px;background:#e8f9ee;border:3px solid #86efac;color:#15803d;border-radius:24px;padding:18px 26px;font-size:27px;font-weight:700;text-align:center}}
+    .sum{{margin-top:22px;font-size:28px;line-height:1.7;font-weight:500;background:#fff9db;border-radius:24px;padding:22px 30px;border-right:10px solid #facc15}}
+    .sum b{{color:#c2410c;font-weight:800}}
+    .foot{{position:absolute;left:0;right:0;bottom:12px;height:100px;background:{col['primary']};color:#fff;display:flex;align-items:center;justify-content:center;gap:34px;font-size:24px;font-weight:500}}
     .foot b{{color:{col['soft']}}}
+    .bot{{position:absolute;left:0;right:0;bottom:0;height:12px;background:{rainbow}}}
     """
     summary = data.get("summary") or auto_summary(data, c)
-    period = f'من <bdi>{fmt_date(data.get("start_date"))}</bdi> إلى <bdi>{fmt_date(data.get("end_date"))}</bdi>'
+    period = f'📅 من <bdi>{fmt_date(data.get("start_date"))}</bdi> إلى <bdi>{fmt_date(data.get("end_date"))}</bdi>'
     return (f'<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><style>{css}</style></head><body>'
-            f'<div class="wrap"><div class="head"><div><h1>نتائج حملتك الإعلانية</h1>'
+            f'<div class="top"></div><div class="wrap"><div class="head"><div><h1>📊 نتائج حملتك الإعلانية</h1>'
             f'<p>{esc(data.get("client_name", ""))}</p></div><img src="{logo}" alt=""></div>'
-            f'<div class="meta"><span>الباقة ال{esc(pkg["tier"])} <bdi>· {pkg["days"]} أيام</bdi></span>'
-            f'<span>هدف: {esc(obj["label"])}</span><span>{period}</span></div>'
-            f'<div class="grid">{tiles_html}</div>{promise}<div class="sum">{summary}</div></div>'
+            f'<div class="meta"><span class="c-orange">📦 الباقة ال{esc(pkg["tier"])} <bdi>· {pkg["days"]} أيام</bdi></span>'
+            f'<span class="c-green">🎯 {esc(obj["label"])}</span><span class="c-purple">{period}</span></div>'
+            f'<div class="grid">{tiles_html}</div>{promise}<div class="sum">✨ {summary}</div></div>'
             f'<div class="foot"><span><b>IG</b> {esc(contacts["instagram"])}</span>'
             f'<span dir="ltr">📞 {esc(" / ".join(contacts["phones"]))}</span>'
-            f'<span>📍 {esc(contacts["address"])}</span></div></body></html>')
+            f'<span>📍 {esc(contacts["address"])}</span></div><div class="bot"></div></body></html>')
 
 
 # ----------------------------------------------------------------------------

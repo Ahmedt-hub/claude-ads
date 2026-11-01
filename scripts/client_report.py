@@ -71,7 +71,8 @@ METRICS = {
     "comments": ("التعليقات", "عدد التعليقات على الإعلان.", "int"),
     "shares": ("المشاركات", "عدد المرات التي شارك فيها الناس إعلانك مع غيرهم.", "int"),
     "saves": ("الحفظ", "عدد الأشخاص الذين حفظوا المنشور للرجوع إليه لاحقاً، وهذا دليل اهتمام قوي.", "int"),
-    "ig_profile_visits": ("زيارات بروفايل إنستغرام", "عدد المرات التي دخل فيها الناس إلى حسابك على إنستغرام من الإعلان.", "int"),
+    "fb_page_visits": ("زيارات صفحة فيسبوك", "عدد المرات التي دخل فيها الناس إلى صفحتك على فيسبوك.", "int"),
+    "ig_profile_visits": ("زيارات بروفايل إنستغرام", "عدد المرات التي دخل فيها الناس إلى حسابك على إنستغرام.", "int"),
     "ig_follows": ("متابعون جدد على إنستغرام", "عدد الأشخاص الذين تابعوا حسابك على إنستغرام.", "int"),
     "fb_follows": ("متابعون جدد على فيسبوك", "عدد الأشخاص الذين تابعوا صفحتك على فيسبوك.", "int"),
     "video_3s": ("مشاهدات 3 ثوانٍ", "عدد المرات التي شوهد فيها الفيديو 3 ثوانٍ على الأقل.", "int"),
@@ -85,7 +86,7 @@ METRICS = {
 
 GROUPS = [
     ("👀 الوصول والظهور", ["reach", "impressions", "frequency"], "blue"),
-    ("🎯 النتائج", ["messaging_conversations", "ig_profile_visits", "ig_follows", "fb_follows"], "green"),
+    ("🎯 النتائج", ["messaging_conversations", "fb_page_visits", "ig_profile_visits", "fb_follows", "ig_follows"], "green"),
     ("❤️ التفاعل", ["post_engagement", "reactions", "comments", "shares", "saves"], "red"),
     ("👆 الضغطات", ["clicks_all", "link_clicks", "ctr_all", "link_ctr"], "orange"),
 ]
@@ -94,7 +95,7 @@ EMOJI = {
     "reach": "👀", "impressions": "📺", "frequency": "🔁", "clicks_all": "👆", "link_clicks": "🔗",
     "ctr_all": "📊", "link_ctr": "🎯", "messaging_conversations": "💬", "post_engagement": "🔥",
     "reactions": "❤️", "comments": "🗨️", "shares": "🔄", "saves": "🔖", "ig_profile_visits": "📸",
-    "ig_follows": "➕", "fb_follows": "👍", "video_3s": "▶️", "thruplays": "🎬", "video_p50": "⏯️",
+    "ig_follows": "➕", "fb_follows": "👍", "fb_page_visits": "🏠", "video_3s": "▶️", "thruplays": "🎬", "video_p50": "⏯️",
     "video_p100": "🏁", "avg_watch_time": "⏱️", "hook_rate": "🪝", "hold_rate": "🧲",
 }
 OBJ_EMOJI = {"messages": "💬", "engagement": "🔥", "profile": "📸", "video": "🎬"}

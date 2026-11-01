@@ -352,17 +352,21 @@ def hbars(rows: list[tuple[str, float]], total: float | None = None, colors: lis
 def age_gender_chart(rows: list[dict]) -> str:
     if not rows:
         return ""
+    has_m = any((num(r.get("male")) or 0) > 0 for r in rows)
+    has_f = any((num(r.get("female")) or 0) > 0 for r in rows)
     vmax = max(max(num(r.get("male")) or 0, num(r.get("female")) or 0) for r in rows) or 1
-    out = ['<div class="ag"><div class="ag-legend"><span class="dot gm"></span>👨 رجال'
-           '<span class="dot gf"></span>👩 نساء</div>']
+    legend = ('<span class="dot gm"></span>👨 رجال' if has_m else "") + \
+             ('<span class="dot gf"></span>👩 نساء' if has_f else "")
+    out = [f'<div class="ag"><div class="ag-legend">{legend}</div>']
     for r in rows:
         mv, fv = num(r.get("male")) or 0, num(r.get("female")) or 0
-        out.append(
-            f'<div class="ag-row"><div class="ag-lab">{esc(r.get("age"))}</div><div class="ag-bars">'
-            f'<div class="ag-bar gm" style="width:{mv / vmax * 100:.1f}%"></div><span>{fmt(mv)}</span>'
-            f'<div class="ag-break"></div>'
-            f'<div class="ag-bar gf" style="width:{fv / vmax * 100:.1f}%"></div><span>{fmt(fv)}</span>'
-            f'</div></div>')
+        bars = []
+        if has_m:
+            bars.append(f'<div class="ag-bar gm" style="width:{mv / vmax * 100:.1f}%"></div><span>{fmt(mv)}</span>')
+        if has_f:
+            bars.append(f'<div class="ag-bar gf" style="width:{fv / vmax * 100:.1f}%"></div><span>{fmt(fv)}</span>')
+        out.append(f'<div class="ag-row"><div class="ag-lab">{esc(r.get("age"))}</div><div class="ag-bars">'
+                   + '<div class="ag-break"></div>'.join(bars) + '</div></div>')
     out.append("</div>")
     return "".join(out)
 
@@ -486,12 +490,12 @@ def footer_html(agency: dict) -> str:
             f'<span dir="ltr">📞 {esc(phones)}</span><span>📍 {esc(c["address"])}</span></div>')
 
 
-def metric_card(key: str, m: dict, color: str = "blue") -> str:
+def metric_card(key: str, m: dict, color: str = "blue", no_rating: tuple = ()) -> str:
     if key not in METRICS or m.get(key) is None:
         return ""
     label, exp, kind = METRICS[key]
     v = num(m[key])
-    r = rating(key, v)
+    r = None if key in no_rating else rating(key, v)
     badge = f'<span class="badge {r[1]}">{r[0]}</span>' if r else ""
     return (f'<div class="m c-{color}"><div class="ic">{EMOJI.get(key, "📌")}</div><div>'
             f'<div class="top"><span class="lab">{esc(label)}{badge}</span>'
@@ -579,7 +583,7 @@ def build_blocks(data: dict, agency: dict, c: dict, base: Path) -> list[str]:
     # ---------------- Detailed metrics ----------------
     first = True
     for gname, keys, gcol in GROUPS:
-        cards = "".join(metric_card(k, m, gcol) for k in keys)
+        cards = "".join(metric_card(k, m, gcol, tuple(data.get("hide_ratings", []))) for k in keys)
         if cards:
             head = ('<h2 class="chapter">📊 تفاصيل النتائج <span>كل رقم مع شرح بسيط لمعناه</span></h2>'
                     if first else "")

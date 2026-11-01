@@ -1,7 +1,7 @@
 ---
 name: ads
 description: "Multi-platform paid advertising audit and optimization skill. Analyzes Google, Meta, YouTube, LinkedIn, TikTok, Microsoft, and Apple Search Ads. 225+ checks with scoring, parallel agents, industry templates, and AI creative generation."
-argument-hint: "audit | google | meta | youtube | linkedin | tiktok | microsoft | apple | creative | landing | budget | plan <type> | competitor | dna <url> | create | generate | photoshoot"
+argument-hint: "audit | google | meta | youtube | linkedin | tiktok | microsoft | apple | creative | landing | budget | plan <type> | competitor | dna <url> | create | generate | photoshoot | report <campaign>"
 license: MIT
 ---
 
@@ -32,6 +32,7 @@ LinkedIn, TikTok, Microsoft). Orchestrates 17 specialized sub-skills and
 | `/ads create` | Generate campaign concepts + copy briefs, outputs `campaign-brief.md` |
 | `/ads generate` | Generate AI ad images from brief, outputs to `ad-assets/` |
 | `/ads photoshoot` | Product photography in 5 styles (Studio, Floating, Ingredient, In Use, Lifestyle) |
+| `/ads report <campaign>` | End-of-campaign Arabic client report (PDF + PNG card), see `skills/ads-client-report` |
 
 ## Context Intake (Required: Always Do This First)
 
@@ -168,7 +169,7 @@ Aggregate = Sum(Platform_Score x Platform_Budget_Share)
 
 ## Sub-Skills
 
-This skill orchestrates 17 specialized sub-skills:
+This skill orchestrates 18 specialized sub-skills:
 
 1. **ads-audit**: Full multi-platform audit with parallel delegation
 2. **ads-google**: Google Ads deep analysis (Search, PMax, YouTube)
@@ -187,6 +188,7 @@ This skill orchestrates 17 specialized sub-skills:
 15. **ads-create**: Campaign concepts, copy decks, creative briefs
 16. **ads-generate**: AI image generation with pluggable providers
 17. **ads-photoshoot**: Product photography in 5 professional styles
+18. **ads-client-report**: End-of-campaign Arabic client report (PDF + PNG), agency-branded
 
 ## Subagents
 

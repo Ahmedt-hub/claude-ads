@@ -1,0 +1,101 @@
+{
+  "client_name": "Miris Fragrances",
+  "campaign_name": "Miris Fragrances 24/10/2026",
+  "objective": "messages",
+  "start_date": "2026-10-24",
+  "end_date": "2026-10-30",
+  "package": {"tier": "متوسطة", "days": 7},
+  "is_video": true,
+  "made_by_agency": true,
+  "metrics": {
+    "reach": 18450,
+    "impressions": 41200,
+    "frequency": 2.23,
+    "clicks_all": 1384,
+    "link_clicks": 612,
+    "ctr_all": 3.36,
+    "link_ctr": 1.49,
+    "messaging_conversations": 96,
+    "post_engagement": 2210,
+    "reactions": 342,
+    "comments": 57,
+    "shares": 21,
+    "saves": 38,
+    "ig_profile_visits": 214,
+    "ig_follows": 31,
+    "fb_follows": null,
+    "video_3s": 11050,
+    "thruplays": 3120,
+    "video_p50": 2480,
+    "video_p100": 1190,
+    "avg_watch_time": 6.4
+  },
+  "daily": [
+    {"date": "2026-10-24", "results": 9},
+    {"date": "2026-10-25", "results": 14},
+    {"date": "2026-10-26", "results": 12},
+    {"date": "2026-10-27", "results": 18},
+    {"date": "2026-10-28", "results": 16},
+    {"date": "2026-10-29", "results": 15},
+    {"date": "2026-10-30", "results": 12}
+  ],
+  "hourly": [
+    {"hour": 9, "results": 2}, {"hour": 10, "results": 3}, {"hour": 11, "results": 4},
+    {"hour": 12, "results": 5}, {"hour": 13, "results": 6}, {"hour": 14, "results": 7},
+    {"hour": 15, "results": 6}, {"hour": 16, "results": 5}, {"hour": 17, "results": 6},
+    {"hour": 18, "results": 7}, {"hour": 19, "results": 9}, {"hour": 20, "results": 12},
+    {"hour": 21, "results": 13}, {"hour": 22, "results": 8}, {"hour": 23, "results": 3}
+  ],
+  "platforms": [
+    {"name": "فيسبوك", "reach": 11300, "results": 61},
+    {"name": "إنستغرام", "reach": 7150, "results": 35}
+  ],
+  "age_gender": [
+    {"age": "18-24", "male": 1900, "female": 3100},
+    {"age": "25-34", "male": 2600, "female": 4700},
+    {"age": "35-44", "male": 1500, "female": 2400},
+    {"age": "45-54", "male": 700, "female": 1050},
+    {"age": "55+", "male": 220, "female": 280}
+  ],
+  "regions": [
+    {"name": "باتنة", "reach": 7900},
+    {"name": "سطيف", "reach": 3100},
+    {"name": "قسنطينة", "reach": 2600},
+    {"name": "خنشلة", "reach": 1700},
+    {"name": "بسكرة", "reach": 1500},
+    {"name": "أم البواقي", "reach": 1100},
+    {"name": "مسيلة", "reach": 550}
+  ],
+  "ads": [
+    {"name": "فيديو عطر الشتاء", "thumbnail": null, "results": 64, "reach": 11200, "link_ctr": 1.8, "hook_rate": 29.1,
+     "why": "بداية الفيديو أظهرت العطر بسرعة مع السعر، فتوقف الناس وشاهدوه وراسلوا للسؤال."},
+    {"name": "صورة العرض", "thumbnail": null, "results": 32, "reach": 7250, "link_ctr": 1.1}
+  ],
+  "previous": {
+    "campaign_name": "Miris Fragrances 05/10/2026",
+    "package": {"tier": "ابتدائية", "days": 7},
+    "reach": 9800,
+    "results": 41,
+    "end_date": "2026-10-11"
+  },
+  "client_feedback": {
+    "note": "جاتني رسائل بزاف بصح ناس قليل اللي شراو",
+    "analysis": [
+      "الإعلان أدّى دوره: 96 شخصاً راسلوك، وتكلفة المحادثة 60 دج فقط وهي تكلفة جيدة.",
+      "أغلب الرسائل جاءت بين 20:00 و22:00. إذا تأخر الرد في هذه الساعات يبرد اهتمام الزبون ويشتري من غيرك.",
+      "الإعلان لا يذكر سعر التوصيل، فقد يسأل الزبون ثم يتراجع عندما يعرف السعر الكلي.",
+      "ننصح بتجهيز رد سريع جاهز فيه السعر والتوصيل وطريقة الطلب."
+    ]
+  },
+  "video_notes": [
+    "26.8% من الناس توقفوا لمشاهدة الفيديو: بداية الفيديو قوية.",
+    "نصف المشاهدين تقريباً خرجوا قبل الثانية 15، لذلك ننصح بفيديو أقصر (10 إلى 12 ثانية) يظهر فيه السعر والعرض مبكراً."
+  ],
+  "recommendations": [
+    "إعادة استعمال فيديو عطر الشتاء لأنه جاب ثلثي الرسائل.",
+    "التركيز على النساء 25-34 سنة في باتنة وسطيف وقسنطينة لأنهن الأكثر تفاعلاً.",
+    "الرد على الرسائل بسرعة خاصة بين 19:00 و22:00.",
+    "ذكر سعر التوصيل في الإعلان لتصلك رسائل من أشخاص جاهزين للشراء."
+  ],
+  "next_package": {"tier": "متوسطة", "days": 10, "reason": "نتائج هذه الحملة ممتازة، ومدة أطول تعطي الإعلان وقتاً أكثر ليتعلم ويجيب رسائل بتكلفة أقل."}
+}

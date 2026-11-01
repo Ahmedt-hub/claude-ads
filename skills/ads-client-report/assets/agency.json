@@ -1,0 +1,48 @@
+{
+  "agency_name": "Napster Digital Services",
+  "logo": "napster-logo.png",
+  "colors": {
+    "primary": "#146884",
+    "secondary": "#5292B5",
+    "accent": "#8AB5F5",
+    "soft": "#AFD0FB",
+    "background": "#EEF5FF"
+  },
+  "contacts": {
+    "instagram": "napster.ds",
+    "facebook": "Napster Digital Services",
+    "phones": ["0728860753", "0672917095"],
+    "address": "حي 5 جويلية، باتنة"
+  },
+  "currency": "دج",
+  "packages_note": "est_reach = [min, max] estimated reach (number of people) promised by the package.",
+  "packages": {
+    "ابتدائية": {
+      "3":  {"price": 1300,  "est_reach": [3000, 6000]},
+      "5":  {"price": 2000,  "est_reach": [5000, 15000]},
+      "7":  {"price": 2950,  "est_reach": [7000, 22000]},
+      "10": {"price": 4200,  "est_reach": [9000, 30000]},
+      "15": {"price": 6300,  "est_reach": [12000, 40000]},
+      "20": {"price": 9000,  "est_reach": [15000, 45000]},
+      "30": {"price": 12000, "est_reach": [29000, 90000]}
+    },
+    "متوسطة": {
+      "3":  {"price": 2700,  "est_reach": [6000, 14000]},
+      "5":  {"price": 4500,  "est_reach": [10000, 25000]},
+      "7":  {"price": 5800,  "est_reach": [14000, 40000]},
+      "10": {"price": 8200,  "est_reach": [20000, 50000]},
+      "15": {"price": 12000, "est_reach": [30000, 85000]},
+      "20": {"price": 15500, "est_reach": [40000, 120000]},
+      "30": {"price": 23000, "est_reach": [60000, 250000]}
+    },
+    "متقدمة": {
+      "3":  {"price": 3800,  "est_reach": [9000, 25000]},
+      "5":  {"price": 6300,  "est_reach": [15000, 35000]},
+      "7":  {"price": 8900,  "est_reach": [21000, 65000]},
+      "10": {"price": 12000, "est_reach": [30000, 75000]},
+      "15": {"price": 18000, "est_reach": [45000, 135000]},
+      "20": {"price": 23000, "est_reach": [60000, 180000]},
+      "30": {"price": 35000, "est_reach": [100000, 320000]}
+    }
+  }
+}

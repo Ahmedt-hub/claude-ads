@@ -73,3 +73,7 @@ youtube-script.pdf
 # Internal QA artifacts
 AUDIT-REPORT.md
 .github-audit/
+
+# Client campaign reports (contain client data)
+reports/
+.playwright-mcp/

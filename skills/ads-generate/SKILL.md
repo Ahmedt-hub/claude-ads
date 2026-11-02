@@ -1,6 +1,6 @@
 ---
 name: ads-generate
-description: "AI image generation for paid ad creatives. Reads campaign-brief.md and brand-profile.json to produce platform-sized ad images using banana-claude. Requires banana-claude (v1.4.1+) with nanobanana-mcp configured. Triggers on: generate ads, create images, make ad creatives, generate visuals, create ad images, generate campaign images, make the images, generate from brief."
+description: "AI image generation for paid ad creatives. Reads campaign-brief.md and brand-profile.json to produce platform-sized ad images using banana-claude. Requires banana-claude (v1.4.1+) with nanobanana-mcp configured. Triggers on: generate ads, create images, make ad creatives, generate visuals, create ad images, generate campaign images, make the images, generate from brief, generate video, make a video ad, animate product, veo."
 user-invokable: false
 ---
 
@@ -16,6 +16,7 @@ profile. Uses banana-claude as the image generation provider.
 | `/ads generate` | Generate all images from campaign-brief.md |
 | `/ads generate --platform meta` | Generate Meta assets only |
 | `/ads generate --prompt "text" --ratio 9:16` | Standalone generation without brief |
+| `/ads generate --video` | Generate short video ads (Veo) instead of images |
 
 ## Environment Setup
 
@@ -157,8 +158,23 @@ Platform target → dimensions used:
 
 Use `/banana generate` directly with the specified prompt and aspect ratio.
 
+## Video Mode (`--video`)
+
+Generates 4/6/8-second MP4 ad clips with Google Veo via `scripts/generate_video.py`.
+Load `~/.claude/skills/ads/references/video-providers.md` first.
+
+1. Check `GOOGLE_API_KEY` is set. If not, show the setup steps from video-providers.md and stop.
+2. Build prompts with the 6-part formula (subject, motion, camera, setting, style, audio).
+   Pull style from brand-profile.json. Keep text, prices and logos out of the prompt.
+3. For product ads, prefer image-to-video: pass a generated packshot with `--image`.
+4. Run `--estimate` and show the cost. Ask for confirmation if it is over $5. Use `--fast` for drafts.
+5. Write a batch JSON and run:
+   `python ~/.claude/skills/ads/scripts/generate_video.py --batch videos.json --output-dir ./ad-assets/video/ --json`
+6. Report each file, its ratio, duration and cost. Remind the user to add text overlays and AI-content labels.
+
 ## Reference Files
 
 - `~/.claude/skills/ads/references/image-providers.md`: provider config, pricing, limits
+- `~/.claude/skills/ads/references/video-providers.md`: Veo video models, limits, prompt formula
 - `~/.claude/skills/ads/references/[platform]-creative-specs.md`: per-platform specs
 - `~/.claude/skills/ads/references/brand-dna-template.md`: brand injection schema

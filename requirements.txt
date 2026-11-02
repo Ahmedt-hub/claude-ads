@@ -14,7 +14,7 @@ Pillow>=11.0.0,<13.0.0            # Image dimension validation
 # Install banana-claude separately: https://github.com/AgriciDaniel/claude-banana
 # The packages below are only needed if using generate_image.py fallback directly.
 
-# google-genai>=1.16.0,<2.0.0     # Gemini (only for generate_image.py fallback)
+# google-genai>=1.16.0,<2.0.0     # Gemini: generate_image.py fallback + generate_video.py (Veo)
 # openai>=1.75.0,<2.0.0           # OpenAI gpt-image-1
 # stability-sdk>=0.8.4,<1.0.0     # Stability AI SD 3.5
 # replicate>=1.0.4,<2.0.0         # Replicate / FLUX.1 Pro

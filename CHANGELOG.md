@@ -5,6 +5,13 @@ All notable changes to claude-ads are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Video generation with Google Veo** (`scripts/generate_video.py`): text-to-video and image-to-video ad clips (9:16 / 16:9, 4-8s, 720p/1080p) using the Gemini API key. Supports platform presets, batch JSON, `--fast` drafts, `--estimate` cost preview, and JSON output.
+- `ads/references/video-providers.md`: Veo models, limits, pricing, platform mapping, and ad video prompt formula.
+- `ads-generate --video` mode.
+
 ## [1.4.0] - 2026-04-01
 
 ### Added

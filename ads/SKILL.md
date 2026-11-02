@@ -30,7 +30,7 @@ LinkedIn, TikTok, Microsoft). Orchestrates 17 specialized sub-skills and
 | `/ads competitor` | Competitor ad intelligence analysis |
 | `/ads dna <url>` | Extract brand DNA from website, outputs `brand-profile.json` |
 | `/ads create` | Generate campaign concepts + copy briefs, outputs `campaign-brief.md` |
-| `/ads generate` | Generate AI ad images from brief, outputs to `ad-assets/` |
+| `/ads generate` | Generate AI ad images from brief, outputs to `ad-assets/` (`--video` for Veo video ads) |
 | `/ads photoshoot` | Product photography in 5 styles (Studio, Floating, Ingredient, In Use, Lifestyle) |
 
 ## Context Intake (Required: Always Do This First)
@@ -128,6 +128,7 @@ When sub-skills or agents reference `ads/references/*.md`, resolve to
 - `references/microsoft-audit.md`: 20-check Microsoft Ads audit checklist
 - `references/brand-dna-template.md`: Brand DNA schema and extraction guide
 - `references/image-providers.md`: Provider config (Gemini/OpenAI/Stability/Replicate)
+- `references/video-providers.md`: Veo video generation (models, limits, prompt formula)
 - `references/google-creative-specs.md`: PMax/RSA/YouTube generation-ready specs
 - `references/meta-creative-specs.md`: Feed/Reels/Stories specs + safe zones
 - `references/linkedin-creative-specs.md`: Single image/video B2B constraints

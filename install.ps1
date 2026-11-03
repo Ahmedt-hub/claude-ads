@@ -105,7 +105,7 @@ function Main {
         Write-Host ""
         Write-Host "  Installed:"
         Write-Host "    - 1 main skill (ads orchestrator)"
-        Write-Host "    - 17 sub-skills (platform + functional + creative)"
+        Write-Host "    - 18 sub-skills (platform + functional + creative)"
         Write-Host "    - 10 agents (6 audit + 4 creative)"
         Write-Host "    - 23 reference files"
         Write-Host "    - 11 industry templates"

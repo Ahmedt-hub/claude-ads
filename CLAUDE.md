@@ -4,7 +4,7 @@
 
 This repository contains **Claude Ads**, a Tier 4 Claude Code skill for comprehensive
 paid advertising analysis across all major platforms. It follows the Agent Skills open
-standard and the 3-layer architecture (directive, orchestration, execution). 17 sub-skills,
+standard and the 3-layer architecture (directive, orchestration, execution). 18 sub-skills,
 10 agents (6 audit + 4 creative), and 11 industry templates cover Google, Meta, YouTube, LinkedIn,
 TikTok, Microsoft, and Apple Search Ads with 225+ weighted audit checks.
 
@@ -17,7 +17,7 @@ claude-ads/
     SKILL.md                         # Entry point, routing table, core rules
     references/                      # On-demand knowledge files (23 files)
     scripts/                         # Python execution scripts
-  skills/                            # 17 specialized sub-skills
+  skills/                            # 18 specialized sub-skills
     ads-audit/SKILL.md              # Full multi-platform audit
     ads-google/SKILL.md            # Google Ads deep analysis
     ads-meta/SKILL.md              # Meta/Facebook Ads analysis
@@ -27,6 +27,7 @@ claude-ads/
     ads-microsoft/SKILL.md        # Microsoft/Bing Ads analysis
     ads-creative/SKILL.md         # Creative quality assessment
     ads-landing/SKILL.md          # Landing page analysis
+    ads-landing-image/            # Arabic long-image landing page prompt (SKILL.md + assets/)
     ads-budget/SKILL.md           # Budget allocation optimization
     ads-plan/SKILL.md             # Strategic ad planning by industry
     ads-competitor/SKILL.md       # Competitor ad research
@@ -54,6 +55,7 @@ claude-ads/
 | `/ads microsoft` | Microsoft/Bing Ads analysis |
 | `/ads creative` | Creative quality and fatigue assessment |
 | `/ads landing` | Landing page conversion analysis |
+| `/ads landing-image` | Arabic long-image landing page copy + Nano Banana Pro prompt |
 | `/ads budget` | Budget allocation optimization |
 | `/ads plan <type>` | Strategic ad planning by industry |
 | `/ads competitor` | Competitor ad research |

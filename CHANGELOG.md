@@ -5,6 +5,11 @@ All notable changes to claude-ads are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **ads-landing-image** (`/ads landing-image`): Arabic direct-response copy and a ready-to-paste Nano Banana Pro prompt that generates one long vertical landing-page image from product photos. Two-step flow (analyze photos and ask with suggested defaults, then write the prompt), marketing-angle selection with local cultural fit, Algeria/Foorweb store profile, section library by product type, copywriting rules, photo-fidelity and seamless-background rules, and a fix-up message template. Also exposed as a project skill via `.claude/skills/ads-landing-image`.
+
 ## [1.4.0] - 2026-04-01
 
 ### Added

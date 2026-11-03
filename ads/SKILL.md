@@ -1,14 +1,14 @@
 ---
 name: ads
 description: "Multi-platform paid advertising audit and optimization skill. Analyzes Google, Meta, YouTube, LinkedIn, TikTok, Microsoft, and Apple Search Ads. 225+ checks with scoring, parallel agents, industry templates, and AI creative generation."
-argument-hint: "audit | google | meta | youtube | linkedin | tiktok | microsoft | apple | creative | landing | budget | plan <type> | competitor | dna <url> | create | generate | photoshoot"
+argument-hint: "audit | google | meta | youtube | linkedin | tiktok | microsoft | apple | creative | landing | landing-image | budget | plan <type> | competitor | dna <url> | create | generate | photoshoot"
 license: MIT
 ---
 
 # Ads: Multi-Platform Paid Advertising Audit & Optimization
 
 Comprehensive ad account analysis across all major platforms (Google, Meta,
-LinkedIn, TikTok, Microsoft). Orchestrates 17 specialized sub-skills and
+LinkedIn, TikTok, Microsoft). Orchestrates 18 specialized sub-skills and
 10 agents (6 audit + 4 creative).
 
 ## Quick Reference
@@ -24,6 +24,7 @@ LinkedIn, TikTok, Microsoft). Orchestrates 17 specialized sub-skills and
 | `/ads microsoft` | Microsoft/Bing Ads deep analysis (Copilot, Import) |
 | `/ads creative` | Cross-platform creative quality audit |
 | `/ads landing` | Landing page quality assessment for ad campaigns |
+| `/ads landing-image` | Arabic long-image landing page: copy + Nano Banana Pro prompt (Algeria COD, Foorweb) |
 | `/ads budget` | Budget allocation and bidding strategy review |
 | `/ads plan <business-type>` | Strategic ad plan with industry templates |
 | `/ads apple` | Apple Search Ads (ASA) deep analysis |
@@ -46,6 +47,9 @@ Ask these questions upfront (combine into one message):
 2. **Monthly ad spend**: Total budget and per-platform breakdown (approximate is fine)
 3. **Primary goal**: Sales / Revenue · Leads / Demos · App Installs · Calls · Brand
 4. **Active platforms**: Which platforms are you advertising on?
+
+Skip this intake for `/ads landing-image`: it runs its own intake (product photos,
+angle, offers) defined in `skills/ads-landing-image/SKILL.md`.
 
 If the user provides data upfront (e.g. "audit my Google Ads, I spend $5k/mo on SaaS"),
 extract context from that and proceed without re-asking.
@@ -168,7 +172,7 @@ Aggregate = Sum(Platform_Score x Platform_Budget_Share)
 
 ## Sub-Skills
 
-This skill orchestrates 17 specialized sub-skills:
+This skill orchestrates 18 specialized sub-skills:
 
 1. **ads-audit**: Full multi-platform audit with parallel delegation
 2. **ads-google**: Google Ads deep analysis (Search, PMax, YouTube)
@@ -187,6 +191,7 @@ This skill orchestrates 17 specialized sub-skills:
 15. **ads-create**: Campaign concepts, copy decks, creative briefs
 16. **ads-generate**: AI image generation with pluggable providers
 17. **ads-photoshoot**: Product photography in 5 professional styles
+18. **ads-landing-image**: Arabic long-image landing page copy + Nano Banana Pro prompt
 
 ## Subagents
 

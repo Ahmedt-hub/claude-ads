@@ -92,7 +92,7 @@ main() {
     echo ""
     echo "  Installed:"
     echo "    • 1 main skill (ads orchestrator)"
-    echo "    • 17 sub-skills (platform + functional + creative)"
+    echo "    • 18 sub-skills (platform + functional + creative)"
     echo "    • 10 agents (6 audit + 4 creative)"
     echo "    • 23 reference files"
     echo "    • 11 industry templates"

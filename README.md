@@ -99,6 +99,7 @@ claude
 | `/ads microsoft` | Microsoft/Bing Ads deep analysis (Copilot, Import validation) |
 | `/ads creative` | Cross-platform creative quality audit and fatigue detection |
 | `/ads landing` | Landing page quality assessment for ad campaigns |
+| `/ads landing-image` | Arabic long-image landing page copy + Nano Banana Pro prompt |
 | `/ads budget` | Budget allocation and bidding strategy review |
 | `/ads apple` | Apple Search Ads (ASA) deep analysis (campaign structure, bids, MMP, TAP) |
 | `/ads plan <type>` | Strategic ad plan with industry templates |
@@ -179,7 +180,7 @@ Hard rules enforced during every audit:
 ```
 ~/.claude/skills/ads/              # Main orchestrator
 ~/.claude/skills/ads/references/   # 23 RAG reference files
-~/.claude/skills/ads-*/            # 17 sub-skills
+~/.claude/skills/ads-*/            # 18 sub-skills
 ~/.claude/skills/ads-plan/assets/  # 11 industry templates
 ~/.claude/agents/                  # 10 agents (6 audit + 4 creative)
 ```
